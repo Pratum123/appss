@@ -1,9 +1,8 @@
-<!-- ✅ Updated index.html with Default Subjects + Gist Sync (canvas me nhi chahiye) -->
 <!DOCTYPE html>
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <title>📘 विषय चयन</title>
+  <title>📚 विषय चयन</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -56,60 +55,98 @@
       color: #333;
       margin-bottom: 10px;
     }
+    .settings-link {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .settings-link a {
+      background: #3949ab;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
+  <header>📚 Quiz App</header>
 
-<header>📘 Quiz App</header>
-
-<div class="container">
-  <h1>📘 विषय और उपविषय चयन</h1>
-
-  <!-- विषय चयन -->
-  <div class="section">
-    <label><strong>मुख्य विषय:</strong></label>
-    <select id="mainSubject" onchange="populateSubSubjects()">
-      <option value="">-- विषय चुनें --</option>
-    </select>
-    <label><strong>उपविषय:</strong></label>
-    <select id="subSubject">
-      <option value="">-- उपविषय चुनें --</option>
-    </select>
-    <button class="btn" onclick="proceedToAction()">👉 आगे बढ़ें</button>
+  <!-- ✅ Settings Button -->
+  <div class="settings-link">
+    <a href="settings.html">⚙️ सेटिंग्स</a>
   </div>
 
-  <!-- नया विषय जोड़ें -->
-  <div class="section">
-    <h3>➕ नया विषय जोड़ें</h3>
-    <input id="newMain" placeholder="मुख्य विषय (जैसे: Economics)">
-    <input id="newSubs" placeholder="उपविषय (कॉमा से अलग करें)">
-    <button class="btn" onclick="addNewSubject()">💾 जोड़ें</button>
+  <div class="container">
+    <h1>📚 विषय और उपविषय चयन</h1>
+    <div class="section">
+      <label><strong>मुख्य विषय:</strong></label>
+      <select id="mainSubject" onchange="populateSubSubjects()">
+        <option value="">-- विषय चुनें --</option>
+      </select>
+      <label><strong>उपविषय:</strong></label>
+      <select id="subSubject">
+        <option value="">-- उपविषय चुनें --</option>
+      </select>
+      <button class="btn" onclick="proceedToAction()">👉 आगे बढ़ें</button>
+    </div>
+    <div class="section">
+      <h3>➕ नया विषय जोड़ें</h3>
+      <input id="newMain" placeholder="मुख्य विषय">
+      <input id="newSubs" placeholder="उपविषय (कॉमा से अलग करें)">
+      <button class="btn" onclick="addNewSubject()">📂 जोड़ें</button>
+    </div>
+    <div class="section">
+      <h3>🛠️ उपविषय प्रबंधन</h3>
+      <select id="manageMain" onchange="populateSubList()">
+        <option value="">-- विषय चुनें --</option>
+      </select>
+      <select id="subList"></select>
+      <button class="btn" onclick="deleteSub()">🖑️ उपविषय हटाएं</button>
+    </div>
+    <div class="section">
+      <h3>☁️ GitHub Gist Sync</h3>
+      <input id="gistToken" placeholder="🔑 GitHub Token">
+      <button class="btn" onclick="saveToken()">🔐 Token सेव करें</button>
+      <button class="btn" onclick="exportToGist()">📂 Gist में सेव करें</button>
+      <input id="gistIdInput" placeholder="🔗 Gist ID डालें">
+      <button class="btn" onclick="importFromGist()">📅 Gist से लोड करें</button>
+    </div>
+    <div class="section">
+      <h3>📂 Local JSON Backup</h3>
+      <input type="file" id="importFile" accept=".json" onchange="importData()">
+    </div>
   </div>
-
-  <!-- उपविषय प्रबंधन -->
-  <div class="section">
-    <h3>🛠️ उपविषय प्रबंधन</h3>
-    <select id="manageMain" onchange="populateSubList()">
-      <option value="">-- विषय चुनें --</option>
-    </select>
-    <select id="subList"></select>
-    <button class="btn" onclick="deleteSub()">🗑️ उपविषय हटाएं</button>
-  </div>
-
-  <!-- GitHub Gist Sync -->
-  <div class="section">
-    <h3>☁️ GitHub Gist Sync</h3>
-    <input id="gistToken" placeholder="🔑 GitHub Token">
-    <button class="btn" onclick="saveToken()">🔐 Token सेव करें</button>
-    <button class="btn" onclick="exportToGist()">💾 Gist में सेव करें</button>
-    <input id="gistIdInput" placeholder="🔗 Gist ID डालें">
-    <button class="btn" onclick="importFromGist()">📥 Gist से लोड करें</button>
-  </div>
-</div>
 
 <script>
-let subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
+async function autoImportFromGist() {
+  const gistId = localStorage.getItem("gist_id");
+  if (!gistId) return;
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`);
+    const gist = await res.json();
+    const content = gist.files["quiz_backup.json"].content;
+    const data = JSON.parse(content);
+    if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
+    if (data.main) localStorage.setItem("selectedMain", data.main);
+    if (data.sub) localStorage.setItem("selectedSub", data.sub);
+    if (data.quizData) {
+      for (let key in data.quizData) {
+        localStorage.setItem(key, JSON.stringify(data.quizData[key]));
+      }
+    }
+  } catch (e) {
+    console.error("❌ Gist auto-load error:", e);
+  }
+}
 
+window.onload = async () => {
+  await autoImportFromGist();
+  populateDropdowns();
+};
+
+let subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
 if (Object.keys(subjects).length === 0) {
   subjects = {
     economics: ["Micro", "Macro", "Growth"],
@@ -122,13 +159,11 @@ if (Object.keys(subjects).length === 0) {
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
 function populateDropdowns() {
   const main = document.getElementById("mainSubject");
   const manage = document.getElementById("manageMain");
   main.innerHTML = '<option value="">-- विषय चुनें --</option>';
   manage.innerHTML = '<option value="">-- विषय चुनें --</option>';
-
   for (let key in subjects) {
     const opt1 = new Option(capitalize(key), key);
     const opt2 = new Option(capitalize(key), key);
@@ -136,7 +171,6 @@ function populateDropdowns() {
     manage.appendChild(opt2);
   }
 }
-
 function populateSubSubjects() {
   const subject = document.getElementById("mainSubject").value;
   const subs = subjects[subject] || [];
@@ -146,7 +180,6 @@ function populateSubSubjects() {
     subSelect.appendChild(new Option(sub, sub));
   });
 }
-
 function addNewSubject() {
   const newMain = document.getElementById("newMain").value.trim().toLowerCase();
   const newSubs = document.getElementById("newSubs").value.split(',').map(s => s.trim()).filter(Boolean);
@@ -161,7 +194,6 @@ function addNewSubject() {
   populateDropdowns();
   alert("✅ नया विषय जोड़ा गया!");
 }
-
 function populateSubList() {
   const selected = document.getElementById("manageMain").value;
   const list = document.getElementById("subList");
@@ -172,7 +204,6 @@ function populateSubList() {
     });
   }
 }
-
 function deleteSub() {
   const subject = document.getElementById("manageMain").value;
   const sub = document.getElementById("subList").value;
@@ -184,7 +215,6 @@ function deleteSub() {
     alert("🗑️ उपविषय हटा दिया गया!");
   }
 }
-
 function proceedToAction() {
   const main = document.getElementById("mainSubject").value;
   const sub = document.getElementById("subSubject").value;
@@ -196,7 +226,6 @@ function proceedToAction() {
   localStorage.setItem("selectedSub", sub);
   window.location.href = "action.html";
 }
-
 function saveToken() {
   const token = document.getElementById("gistToken").value.trim();
   if (!token) {
@@ -206,7 +235,6 @@ function saveToken() {
   localStorage.setItem("gist_token", token);
   alert("✅ Token सुरक्षित किया गया");
 }
-
 async function exportToGist() {
   const token = localStorage.getItem("gist_token");
   if (!token) {
@@ -248,7 +276,6 @@ async function exportToGist() {
     alert("❌ Gist सेव नहीं हो पाया");
   }
 }
-
 async function importFromGist() {
   const gistId = document.getElementById("gistIdInput").value.trim();
   if (!gistId) {
@@ -270,9 +297,25 @@ async function importFromGist() {
   alert("✅ Gist डेटा सफलतापूर्वक लोड हुआ!");
   location.reload();
 }
-
-window.onload = populateDropdowns;
+function importData() {
+  const file = document.getElementById("importFile").files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = JSON.parse(e.target.result);
+    if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
+    if (data.main) localStorage.setItem("selectedMain", data.main);
+    if (data.sub) localStorage.setItem("selectedSub", data.sub);
+    if (data.quizData) {
+      for (let key in data.quizData) {
+        localStorage.setItem(key, JSON.stringify(data.quizData[key]));
+      }
+    }
+    alert("✅ डेटा सफलतापूर्वक लोड हुआ!");
+    location.reload();
+  };
+  reader.readAsText(file);
+}
 </script>
-
 </body>
 </html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <title>⚙️ Sync Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6fb;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #3949ab;
+    }
+    .container {
+      max-width: 600px;
+      background: white;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background: #3949ab;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    .msg {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚙️ Sync Settings</h1>
+  <div class="container">
+    <label>🔑 GitHub Gist ID:</label>
+    <input id="gistId" placeholder="जैसे: abc123xyz456">
+
+    <label>🔒 GitHub Token:</label>
+    <input id="token" placeholder="जैसे: ghp_abcdef..." type="password">
+
+    <button onclick="saveSettings()">✅ Set Now</button>
+
+    <div class="msg" id="msgBox"></div>
+  </div>
+
+  <script>
+    function saveSettings() {
+      const gistId = document.getElementById("gistId").value.trim();
+      const token = document.getElementById("token").value.trim();
+
+      if (!gistId || !token) {
+        alert("❗ कृपया दोनों फील्ड भरें");
+        return;
+      }
+
+      localStorage.setItem("gist_id", gistId);
+      localStorage.setItem("gist_token", token);
+      document.getElementById("msgBox").textContent = "✅ सेटिंग सफलतापूर्वक सेव हो गई!";
+    }
+
+    // पहले से सेट वैल्यू हो तो दिखाओ
+    window.onload = () => {
+      document.getElementById("gistId").value = localStorage.getItem("gist_id") || "";
+      document.getElementById("token").value = localStorage.getItem("gist_token") || "";
+    }
+  </script>
+</body>
+</html>

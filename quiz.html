@@ -22,7 +22,7 @@
 <header>📚 Quiz App</header>
 <h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
 
-<!-- 📥 प्रश्न जोड़ने का सेक्शन -->
+<!-- ✅ प्रश्न जोड़ें सेक्शन -->
 <div id="inputSection" class="section" style="display:none;">
   <h3>➕ नया प्रश्न जोड़ें</h3>
   <textarea id="question" placeholder="प्रश्न"></textarea>
@@ -42,7 +42,7 @@
   <div id="editList" style="margin-top:10px;"></div>
 </div>
 
-<!-- 🎯 अभ्यास सेक्शन -->
+<!-- ✅ अभ्यास सेक्शन -->
 <div id="practiceSection" class="section" style="display:none;">
   <h3>🎯 अभ्यास</h3>
   <div id="progress"></div>
@@ -58,80 +58,27 @@
 <script>
 let questions = [], currentQuestion = 0, correctCount = 0, incorrectCount = 0, editIndex = -1;
 
-async function updateGist() {
-  const token = localStorage.getItem("gist_token");
-  const gistId = localStorage.getItem("gist_id");
-  if (!token || !gistId) return;
-
-  const data = {
-    subjects: JSON.parse(localStorage.getItem("quiz_subjects") || "{}"),
-    main: localStorage.getItem("selectedMain"),
-    sub: localStorage.getItem("selectedSub"),
-    quizData: {}
-  };
-  for (let key in localStorage) {
-    if (key.startsWith("quiz_")) {
-      try {
-        data.quizData[key] = JSON.parse(localStorage.getItem(key));
-      } catch (e) {}
-    }
-  }
-
-  await fetch(`https://api.github.com/gists/${gistId}`, {
-    method: "PATCH",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ files: { "quiz_backup.json": { content: JSON.stringify(data, null, 2) } } })
-  });
-}
-
-async function autoImportFromGist() {
-  const gistId = localStorage.getItem("gist_id");
-  if (!gistId) return;
-  const res = await fetch(`https://api.github.com/gists/${gistId}`);
-  const gist = await res.json();
-  const content = gist.files["quiz_backup.json"].content;
-  const data = JSON.parse(content);
-
-  if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
-  if (data.main) localStorage.setItem("selectedMain", data.main);
-  if (data.sub) localStorage.setItem("selectedSub", data.sub);
-  if (data.quizData) {
-    for (let key in data.quizData) {
-      localStorage.setItem(key, JSON.stringify(data.quizData[key]));
-    }
-  }
-}
-
-window.onload = async () => {
-  await autoImportFromGist();
-  populateQuiz();
-};
-
-function populateQuiz() {
+window.onload = () => {
   const main = localStorage.getItem("selectedMain");
   const sub = localStorage.getItem("selectedSub");
-  const mode = localStorage.getItem("quizMode") || "practice";
+  const mode = localStorage.getItem("quizMode");
+
   if (!main || !sub) {
     alert("❗ विषय चयन नहीं किया गया!");
     window.location.href = "index.html";
     return;
   }
+
   const currentKey = `quiz_${main}_${sub}`;
   questions = JSON.parse(localStorage.getItem(currentKey) || '[]');
-  currentQuestion = 0;
-  correctCount = 0;
-  incorrectCount = 0;
-  editIndex = -1;
-
-  document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
+  document.getElementById("pageTitle").textContent =
+    mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
 
   if (mode === "input") {
     document.getElementById("inputSection").style.display = "block";
     document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-  } else {
+    listEditable();
+  } else if (mode === "practice") {
     if (questions.length === 0) {
       alert("❗ कोई प्रश्न नहीं मिला!");
       window.location.href = "index.html";
@@ -140,8 +87,11 @@ function populateQuiz() {
       document.getElementById("submitBtn").style.display = "block";
       showQuestion();
     }
+  } else {
+    alert("❗ मोड सेट नहीं है!");
+    window.location.href = "index.html";
   }
-}
+};
 
 function saveQuestion() {
   const q = document.getElementById("question").value.trim();
@@ -151,19 +101,24 @@ function saveQuestion() {
   const D = document.getElementById("optD").value.trim();
   const correct = document.getElementById("correct").value;
   const exp = document.getElementById("explanation").value.trim();
+
   if (!q || !A || !B || !C || !D || !correct) {
     alert("❗ सभी फ़ील्ड भरें!");
     return;
   }
+
   const newQ = { question: q, options: { A, B, C, D }, correct, explanation: exp };
+
   if (editIndex >= 0) {
     questions[editIndex] = newQ;
     editIndex = -1;
   } else {
     questions.push(newQ);
   }
-  const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
-  localStorage.setItem(currentKey, JSON.stringify(questions));
+
+  const key = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
+  localStorage.setItem(key, JSON.stringify(questions));
+
   document.getElementById("question").value = '';
   document.getElementById("optA").value = '';
   document.getElementById("optB").value = '';
@@ -171,73 +126,80 @@ function saveQuestion() {
   document.getElementById("optD").value = '';
   document.getElementById("explanation").value = '';
   document.getElementById("correct").value = 'A';
+
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-  updateGist();
+  listEditable();
   alert("✅ प्रश्न सेव हुआ!");
 }
 
-// ✅ अब अभ्यास फंक्शन जोड़ें:
+function listEditable() {
+  const container = document.getElementById("editList");
+  container.innerHTML = "";
+  questions.forEach((q, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = "✏️ Edit";
+    btn.className = "edit-btn";
+    btn.onclick = () => {
+      document.getElementById("question").value = q.question;
+      document.getElementById("optA").value = q.options.A;
+      document.getElementById("optB").value = q.options.B;
+      document.getElementById("optC").value = q.options.C;
+      document.getElementById("optD").value = q.options.D;
+      document.getElementById("correct").value = q.correct;
+      document.getElementById("explanation").value = q.explanation;
+      editIndex = i;
+    };
+    const text = document.createElement("span");
+    text.textContent = `प्रश्न ${i + 1}: ${q.question.slice(0, 40)}...`;
+    const div = document.createElement("div");
+    div.appendChild(btn);
+    div.appendChild(text);
+    container.appendChild(div);
+  });
+}
 
-function showQuestion(index = currentQuestion) {
-  const q = questions[index];
-  document.getElementById("progress").innerText = `📍 प्रश्न ${index + 1} / ${questions.length}`;
-  document.getElementById("quizQuestion").innerHTML = `<strong>${q.question}</strong>`;
+function showQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById("quizQuestion").textContent = `Q${currentQuestion + 1}: ${q.question}`;
   const optionsDiv = document.getElementById("quizOptions");
   optionsDiv.innerHTML = "";
   for (let key in q.options) {
     const btn = document.createElement("button");
+    btn.textContent = `${key}: ${q.options[key]}`;
     btn.className = "btn-option";
-    btn.innerText = `${key}: ${q.options[key]}`;
-    btn.onclick = () => checkAnswer(key);
+    btn.onclick = () => handleAnswer(key);
     optionsDiv.appendChild(btn);
   }
+  document.getElementById("progress").textContent = `प्रश्न ${currentQuestion + 1} / ${questions.length}`;
 }
 
-function checkAnswer(selected) {
+function handleAnswer(selected) {
   const q = questions[currentQuestion];
-  const explanation = document.createElement("div");
-  explanation.className = "explanation";
-  if (selected === q.correct) {
-    correctCount++;
-    explanation.innerText = `✅ सही उत्तर! (${q.correct})`;
-    explanation.style.color = "green";
+  if (selected === q.correct) correctCount++;
+  else incorrectCount++;
+  currentQuestion++;
+  if (currentQuestion >= questions.length) {
+    document.getElementById("quizQuestion").innerHTML = `<b>✅ अभ्यास पूरा हुआ!</b><br>सही: ${correctCount} ❌ गलत: ${incorrectCount}`;
+    document.getElementById("quizOptions").innerHTML = "";
+    document.getElementById("submitBtn").style.display = "none";
   } else {
-    incorrectCount++;
-    explanation.innerText = `❌ गलत उत्तर! सही उत्तर है (${q.correct})\n\n🔍 ${q.explanation}`;
-    explanation.style.color = "red";
+    showQuestion();
   }
-  document.getElementById("quizOptions").appendChild(explanation);
-
-  setTimeout(() => {
-    currentQuestion++;
-    if (currentQuestion < questions.length) {
-      showQuestion();
-    } else {
-      showFinalScore();
-    }
-  }, 2000);
-}
-
-function showFinalScore() {
-  document.getElementById("quizQuestion").innerHTML = `<h3>🎉 अभ्यास पूरा हुआ!</h3>
-    <p>✅ सही: ${correctCount}</p>
-    <p>❌ गलत: ${incorrectCount}</p>`;
-  document.getElementById("quizOptions").innerHTML = "";
-  document.getElementById("submitBtn").style.display = "none";
 }
 
 function goToQuestion() {
-  const index = parseInt(document.getElementById("gotoInput").value) - 1;
-  if (index >= 0 && index < questions.length) {
-    currentQuestion = index;
-    showQuestion(index);
+  const input = document.getElementById("gotoInput").value;
+  const num = parseInt(input);
+  if (!isNaN(num) && num > 0 && num <= questions.length) {
+    currentQuestion = num - 1;
+    showQuestion();
   } else {
-    alert("⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से " + questions.length + " तक)");
+    alert("❗ मान्य प्रश्न संख्या दर्ज करें");
   }
 }
 
 function submitQuiz() {
-  showFinalScore();
+  alert(`🎉 आपने क्विज पूरा किया!\n✅ सही: ${correctCount}\n❌ गलत: ${incorrectCount}`);
 }
 </script>
 </body>

@@ -1,4 +1,3 @@
-<!-- ✅ Full updated and fixed quiz.html with working practice section -->
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -22,6 +21,8 @@
 <body>
 <header>📚 Quiz App</header>
 <h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
+
+<!-- 📥 प्रश्न जोड़ने का सेक्शन -->
 <div id="inputSection" class="section" style="display:none;">
   <h3>➕ नया प्रश्न जोड़ें</h3>
   <textarea id="question" placeholder="प्रश्न"></textarea>
@@ -40,6 +41,8 @@
   <div id="questionCount" style="margin-top:10px;"></div>
   <div id="editList" style="margin-top:10px;"></div>
 </div>
+
+<!-- 🎯 अभ्यास सेक्शन -->
 <div id="practiceSection" class="section" style="display:none;">
   <h3>🎯 अभ्यास</h3>
   <div id="progress"></div>
@@ -51,6 +54,7 @@
   <div id="quizOptions"></div>
   <button id="submitBtn" class="btn" onclick="submitQuiz()" style="display:none;">✅ क्विज सबमिट करें</button>
 </div>
+
 <script>
 let questions = [], currentQuestion = 0, correctCount = 0, incorrectCount = 0, editIndex = -1;
 
@@ -109,7 +113,7 @@ window.onload = async () => {
 function populateQuiz() {
   const main = localStorage.getItem("selectedMain");
   const sub = localStorage.getItem("selectedSub");
-  const mode = localStorage.getItem("quizMode") || "practice"; // fallback default
+  const mode = localStorage.getItem("quizMode") || "practice";
   if (!main || !sub) {
     alert("❗ विषय चयन नहीं किया गया!");
     window.location.href = "index.html";
@@ -122,13 +126,11 @@ function populateQuiz() {
   incorrectCount = 0;
   editIndex = -1;
 
-  document.getElementById("pageTitle").textContent =
-    mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
+  document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
 
   if (mode === "input") {
     document.getElementById("inputSection").style.display = "block";
     document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-    listEditable();
   } else {
     if (questions.length === 0) {
       alert("❗ कोई प्रश्न नहीं मिला!");
@@ -170,9 +172,72 @@ function saveQuestion() {
   document.getElementById("explanation").value = '';
   document.getElementById("correct").value = 'A';
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-  listEditable();
   updateGist();
   alert("✅ प्रश्न सेव हुआ!");
+}
+
+// ✅ अब अभ्यास फंक्शन जोड़ें:
+
+function showQuestion(index = currentQuestion) {
+  const q = questions[index];
+  document.getElementById("progress").innerText = `📍 प्रश्न ${index + 1} / ${questions.length}`;
+  document.getElementById("quizQuestion").innerHTML = `<strong>${q.question}</strong>`;
+  const optionsDiv = document.getElementById("quizOptions");
+  optionsDiv.innerHTML = "";
+  for (let key in q.options) {
+    const btn = document.createElement("button");
+    btn.className = "btn-option";
+    btn.innerText = `${key}: ${q.options[key]}`;
+    btn.onclick = () => checkAnswer(key);
+    optionsDiv.appendChild(btn);
+  }
+}
+
+function checkAnswer(selected) {
+  const q = questions[currentQuestion];
+  const explanation = document.createElement("div");
+  explanation.className = "explanation";
+  if (selected === q.correct) {
+    correctCount++;
+    explanation.innerText = `✅ सही उत्तर! (${q.correct})`;
+    explanation.style.color = "green";
+  } else {
+    incorrectCount++;
+    explanation.innerText = `❌ गलत उत्तर! सही उत्तर है (${q.correct})\n\n🔍 ${q.explanation}`;
+    explanation.style.color = "red";
+  }
+  document.getElementById("quizOptions").appendChild(explanation);
+
+  setTimeout(() => {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+      showQuestion();
+    } else {
+      showFinalScore();
+    }
+  }, 2000);
+}
+
+function showFinalScore() {
+  document.getElementById("quizQuestion").innerHTML = `<h3>🎉 अभ्यास पूरा हुआ!</h3>
+    <p>✅ सही: ${correctCount}</p>
+    <p>❌ गलत: ${incorrectCount}</p>`;
+  document.getElementById("quizOptions").innerHTML = "";
+  document.getElementById("submitBtn").style.display = "none";
+}
+
+function goToQuestion() {
+  const index = parseInt(document.getElementById("gotoInput").value) - 1;
+  if (index >= 0 && index < questions.length) {
+    currentQuestion = index;
+    showQuestion(index);
+  } else {
+    alert("⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से " + questions.length + " तक)");
+  }
+}
+
+function submitQuiz() {
+  showFinalScore();
 }
 </script>
 </body>

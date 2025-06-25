@@ -1,4 +1,4 @@
-<!-- ✅ Updated index.html with GitHub Gist Sync (canvas me nhi chahiye) -->
+<!-- ✅ Updated index.html with Default Subjects + Gist Sync (canvas me nhi chahiye) -->
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -108,7 +108,16 @@
 </div>
 
 <script>
-const subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
+let subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
+
+if (Object.keys(subjects).length === 0) {
+  subjects = {
+    economics: ["Micro", "Macro", "Growth"],
+    history: ["Ancient", "Medieval", "Modern"],
+    geography: ["India", "World"]
+  };
+  localStorage.setItem("quiz_subjects", JSON.stringify(subjects));
+}
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);

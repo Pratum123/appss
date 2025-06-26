@@ -74,19 +74,29 @@
       padding-top: 15px;
       border-top: 1px solid #eee;
       color: #555;
+      line-height: 1.5;
     }
     .edit-btn {
-      float: right;
-      background: #f44336;
-      color: white;
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #FFC107;
+      color: #000;
       border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
+      padding: 2px;
+      border-radius: 4px;
       cursor: pointer;
+      font-size: 10px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .question-item {
       padding: 12px 0;
       border-bottom: 1px solid #eee;
+      position: relative;
     }
     .submit-btn {
       background: linear-gradient(135deg, #4CAF50, #66BB6A);
@@ -107,6 +117,24 @@
       padding: 25px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     }
+    .question-container {
+      position: relative;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .question-text {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .statement {
+      font-weight: normal;
+      color: #555;
+      margin: 5px 0;
+      line-height: 1.4;
+    }
     @media (max-width: 600px) {
       .result-content {
         flex-direction: column;
@@ -121,7 +149,7 @@
 
 <div id="inputSection" class="section" style="display:none;">
   <h3>➕ नया प्रश्न जोड़ें</h3>
-  <textarea id="question" placeholder="प्रश्न लिखें"></textarea>
+  <textarea id="question" placeholder="प्रश्न लिखें (बोल्ड दिखेगा)"></textarea>
   <input id="optA" placeholder="विकल्प A">
   <input id="optB" placeholder="विकल्प B">
   <input id="optC" placeholder="विकल्प C">
@@ -132,7 +160,7 @@
     <option value="C">C</option>
     <option value="D">D</option>
   </select>
-  <textarea id="explanation" placeholder="व्याख्या लिखें"></textarea>
+  <textarea id="explanation" placeholder="व्याख्या लिखें (सामान्य टेक्स्ट)"></textarea>
   <button class="btn" onclick="saveQuestion()">📂 सेव करें</button>
   <div id="questionCount"></div>
   <div id="questionList"></div>
@@ -145,7 +173,9 @@
     <input id="gotoInput" type="number" placeholder="प्रश्न संख्या" style="width:60%; padding:8px;">
     <button id="gotoBtn" onclick="goToQuestion()" class="btn">🔍 जाएं</button>
   </div>
-  <div id="quizQuestion" style="margin-top:15px;"></div>
+  <div id="quizQuestionContainer" style="margin-top:15px;">
+    <div id="quizQuestion" class="question-container"></div>
+  </div>
   <div id="quizOptions"></div>
 </div>
 
@@ -206,8 +236,10 @@ function saveQuestion() {
   if (editIndex >= 0) {
     questions[editIndex] = newQ;
     editIndex = -1;
+    alert("✅ प्रश्न अपडेट हो गया!");
   } else {
     questions.push(newQ);
+    alert("✅ नया प्रश्न जोड़ा गया!");
   }
   
   const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
@@ -222,7 +254,6 @@ function saveQuestion() {
   document.getElementById("correct").value = 'A';
   
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-  alert("✅ प्रश्न सेव हुआ!");
   showAllQuestions();
 }
 
@@ -234,11 +265,29 @@ function showAllQuestions() {
     const div = document.createElement("div");
     div.className = "question-item";
     div.innerHTML = `
-      <strong>Q${index + 1}:</strong> ${q.question.replace(/\n/g, '<br>')}
-      <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>
+      <div style="position:relative;">
+        <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>
+        <div class="question-text">Q${index + 1}: ${formatQuestionText(q.question)}</div>
+      </div>
     `;
     listDiv.appendChild(div);
   });
+}
+
+function formatQuestionText(text) {
+  // स्टेटमेंट्स को अलग करने के लिए (जो बोल्ड नहीं होंगे)
+  const parts = text.split('\n');
+  let result = `<strong>${parts[0]}</strong>`; // पहली लाइन हमेशा बोल्ड
+  
+  if (parts.length > 1) {
+    for (let i = 1; i < parts.length; i++) {
+      if (parts[i].trim() !== '') {
+        result += `<div class="statement">${parts[i]}</div>`;
+      }
+    }
+  }
+  
+  return result;
 }
 
 function editQuestion(index) {
@@ -251,6 +300,28 @@ function editQuestion(index) {
   document.getElementById("correct").value = q.correct;
   document.getElementById("explanation").value = q.explanation;
   editIndex = index;
+  
+  document.getElementById("inputSection").style.display = "block";
+  document.getElementById("practiceSection").style.display = "none";
+  document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
+}
+
+function editCurrentQuestion() {
+  const q = questions[currentQuestion];
+  
+  document.getElementById("inputSection").style.display = "block";
+  document.getElementById("practiceSection").style.display = "none";
+  
+  document.getElementById("question").value = q.question;
+  document.getElementById("optA").value = q.options.A;
+  document.getElementById("optB").value = q.options.B;
+  document.getElementById("optC").value = q.options.C;
+  document.getElementById("optD").value = q.options.D;
+  document.getElementById("correct").value = q.correct;
+  document.getElementById("explanation").value = q.explanation;
+  
+  editIndex = currentQuestion;
+  document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
 }
 
 function goToQuestion() {
@@ -265,11 +336,15 @@ function goToQuestion() {
 
 function showQuestion() {
   const q = questions[currentQuestion];
-  const formattedQ = q.question.replace(/\n/g, "<br>");
   
-  document.getElementById("quizQuestion").innerHTML = `
-    <strong>📘 प्रश्न ${currentQuestion + 1}/${questions.length}:</strong><br>${formattedQ}
+  const quizQuestionHTML = `
+    <div id="quizQuestion" class="question-container">
+      <button class="edit-btn" onclick="editCurrentQuestion()">✏️</button>
+      <div class="question-text">📘 प्रश्न ${currentQuestion + 1}/${questions.length}: ${formatQuestionText(q.question)}</div>
+    </div>
   `;
+  
+  document.getElementById("quizQuestionContainer").innerHTML = quizQuestionHTML;
   
   const optionsDiv = document.getElementById("quizOptions");
   optionsDiv.innerHTML = '';
@@ -377,7 +452,7 @@ function populateQuiz() {
   const mode = localStorage.getItem("quizMode") || "practice";
   const currentKey = `quiz_${main}_${sub}`;
   
-  questions = JSON.parse(localStorage.getItem(currentKey) || []);
+  questions = JSON.parse(localStorage.getItem(currentKey) || '[]');
   currentQuestion = 0;
   correctCount = 0;
   incorrectCount = 0;

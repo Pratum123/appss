@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📚 Quiz App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #eef1f7; margin: 0; padding: 0; }
     header { background: #3949ab; color: white; padding: 20px; font-size: 24px; text-align: center; }
@@ -11,18 +11,27 @@
     textarea, input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
     .btn { background: #3949ab; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 10px; }
     .btn-option { display: block; width: 100%; text-align: left; padding: 10px 15px; border-radius: 6px; background: #f0f0f0; border: 1px solid #ccc; margin: 8px 0; font-size: 16px; cursor: pointer; }
-    .edit-btn { width: 24px; height: 24px; font-size: 14px; background: red; color: white; border-radius: 50%; border: none; margin-right: 10px; cursor: pointer; line-height: 24px; text-align: center; vertical-align: middle; }
-    .explanation { margin-top: 20px; font-weight: bold; border-top: 1px solid #ccc; padding-top: 10px; }
+    .explanation { margin-top: 20px; font-weight: normal; border-top: 1px solid #ccc; padding-top: 10px; }
+    .bold-label { font-weight: bold; display: block; margin-bottom: 5px; color: #222; }
+    .edit-btn { float: right; background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+    .question-item { border-bottom: 1px solid #ddd; padding: 10px 0; }
+    .submit-btn { background: #4CAF50; margin-top: 15px; }
+    .chart-container { width: 100%; max-width: 300px; margin: 20px auto; }
+    .result-stats { display: flex; justify-content: space-around; flex-wrap: wrap; align-items: center; }
+    .result-text { margin-bottom: 20px; }
+    @media (max-width: 600px) {
+      .result-stats { flex-direction: column; }
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header>📚 Quiz App</header>
 <h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
 
-<!-- ➕ प्रश्न जोड़ें सेक्शन -->
 <div id="inputSection" class="section" style="display:none;">
   <h3>➕ नया प्रश्न जोड़ें</h3>
-  <textarea id="question" placeholder="प्रश्न"></textarea>
+  <textarea id="question" placeholder="प्रश्न (लाइन ब्रेक के लिए Enter दबाएँ)"></textarea>
   <input id="optA" placeholder="विकल्प A">
   <input id="optB" placeholder="विकल्प B">
   <input id="optC" placeholder="विकल्प C">
@@ -33,21 +42,34 @@
     <option value="C">C</option>
     <option value="D">D</option>
   </select>
-  <textarea id="explanation" placeholder="व्याख्या"></textarea>
+  <textarea id="explanation" placeholder="व्याख्या (लाइन ब्रेक के लिए Enter दबाएँ)"></textarea>
   <button class="btn" onclick="saveQuestion()">📂 सेव करें</button>
   <div id="questionCount" style="margin-top:10px;"></div>
+  <div id="questionList"></div>
 </div>
 
-<!-- 🎯 अभ्यास सेक्शन -->
 <div id="practiceSection" class="section" style="display:none;">
   <h3>🎯 अभ्यास</h3>
   <div id="progress"></div>
   <div id="gotoContainer" style="margin-top: 15px;">
     <input id="gotoInput" type="number" placeholder="प्रश्न संख्या दर्ज करें" style="width: 60%; padding: 8px;">
-    <button id="gotoBtn" onclick="goToQuestion()" style="padding: 9px 12px; background: #3949ab; color: white; border: none; border-radius: 4px; font-weight: bold;">🔎 जाएं</button>
+    <button id="gotoBtn" onclick="goToQuestion()" class="btn">🔎 जाएं</button>
   </div>
   <div id="quizQuestion" style="margin-top:15px;"></div>
   <div id="quizOptions"></div>
+</div>
+
+<div id="resultSection" class="section" style="display:none;">
+  <h3>📊 परिणाम</h3>
+  <div class="result-stats">
+    <div class="result-text">
+      <p id="resultText"></p>
+    </div>
+    <div class="chart-container">
+      <canvas id="resultChart"></canvas>
+    </div>
+  </div>
+  <button class="btn" onclick="window.location.href='index.html'">🏠 मुख्य पेज पर जाएं</button>
 </div>
 
 <script>
@@ -83,11 +105,46 @@ function saveQuestion() {
   document.getElementById("correct").value = 'A';
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
   alert("✅ प्रश्न सेव हुआ!");
+  showAllQuestions();
+}
+
+function showAllQuestions() {
+  const listDiv = document.getElementById("questionList");
+  listDiv.innerHTML = '';
+  questions.forEach((q, index) => {
+    const div = document.createElement("div");
+    div.className = "question-item";
+    div.innerHTML = `<strong>Q${index + 1}:</strong> ${q.question.replace(/\n/g, '<br>')} <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>`;
+    listDiv.appendChild(div);
+  });
+}
+
+function editQuestion(index) {
+  const q = questions[index];
+  document.getElementById("question").value = q.question;
+  document.getElementById("optA").value = q.options.A;
+  document.getElementById("optB").value = q.options.B;
+  document.getElementById("optC").value = q.options.C;
+  document.getElementById("optD").value = q.options.D;
+  document.getElementById("correct").value = q.correct;
+  document.getElementById("explanation").value = q.explanation;
+  editIndex = index;
+}
+
+function goToQuestion() {
+  const input = parseInt(document.getElementById("gotoInput").value);
+  if (!input || input < 1 || input > questions.length) {
+    alert("⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से " + questions.length + " के बीच)");
+    return;
+  }
+  currentQuestion = input - 1;
+  showQuestion();
 }
 
 function showQuestion() {
   const q = questions[currentQuestion];
-  document.getElementById("quizQuestion").innerHTML = `प्रश्न ${currentQuestion + 1}/${questions.length}: ${q.question}`;
+  const formattedQ = q.question.replace(/\n/g, "<br>");
+  document.getElementById("quizQuestion").innerHTML = `<strong>📘 प्रश्न ${currentQuestion + 1}/${questions.length}:</strong><br>${formattedQ}`;
   const optionsDiv = document.getElementById("quizOptions");
   optionsDiv.innerHTML = '';
   for (let key in q.options) {
@@ -97,29 +154,40 @@ function showQuestion() {
     btn.onclick = () => handleAnswer(key);
     optionsDiv.appendChild(btn);
   }
+  
+  // Submit Quiz Button
+  const submitBtn = document.createElement("button");
+  submitBtn.textContent = "✅ क्विज सबमिट करें";
+  submitBtn.className = "btn submit-btn";
+  submitBtn.onclick = () => {
+    if(confirm("क्या आप वाकई क्विज सबमिट करना चाहते हैं?\nआपने अभी तक " + (correctCount + incorrectCount) + " प्रश्नों के उत्तर दिए हैं।")) {
+      submitQuiz();
+    }
+  };
+  optionsDiv.appendChild(submitBtn);
+  
   document.getElementById("progress").textContent = `📘 ${currentQuestion + 1} / ${questions.length}`;
 }
 
 function handleAnswer(selected) {
   const q = questions[currentQuestion];
   const optionsDiv = document.getElementById("quizOptions");
-
   document.querySelectorAll(".btn-option").forEach(btn => btn.disabled = true);
 
   for (let btn of optionsDiv.children) {
     const key = btn.textContent[0];
     if (key === q.correct) {
-      btn.style.backgroundColor = "green";
+      btn.style.backgroundColor = "#4CAF50";
       btn.style.color = "white";
     } else if (key === selected) {
-      btn.style.backgroundColor = "red";
+      btn.style.backgroundColor = "#F44336";
       btn.style.color = "white";
     }
   }
 
   const expl = document.createElement("div");
   expl.className = "explanation";
-  expl.innerHTML = `✅ सही उत्तर: ${q.correct}<br>📘 व्याख्या: ${q.explanation || 'कोई व्याख्या नहीं दी गई है'}`;
+  expl.innerHTML = `<strong>📘 व्याख्या:</strong><br>${(q.explanation || 'कोई व्याख्या नहीं दी गई है').replace(/\n/g, "<br>")}`;
   optionsDiv.appendChild(expl);
 
   if (selected === q.correct) correctCount++;
@@ -137,20 +205,58 @@ function handleAnswer(selected) {
   optionsDiv.appendChild(nextBtn);
 }
 
-function goToQuestion() {
-  const input = parseInt(document.getElementById("gotoInput").value);
-  if (!input || input < 1 || input > questions.length) {
-    alert("⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से " + questions.length + " के बीच)");
-    return;
-  }
-  currentQuestion = input - 1;
-  showQuestion();
-}
-
 function submitQuiz() {
-  const percent = Math.round((correctCount / questions.length) * 100);
-  alert(`🎯 स्कोर: ${correctCount} सही, ${incorrectCount} गलत\n📊 प्रतिशत: ${percent}%`);
-  window.location.href = "index.html";
+  const totalAnswered = correctCount + incorrectCount;
+  const percent = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+  
+  document.getElementById("practiceSection").style.display = "none";
+  document.getElementById("resultSection").style.display = "block";
+  
+  document.getElementById("resultText").innerHTML = `
+    ✅ सही उत्तर: ${correctCount}<br>
+    ❌ गलत उत्तर: ${incorrectCount}<br>
+    📝 प्रयास किए गए प्रश्न: ${totalAnswered}<br>
+    📊 सटीकता: ${percent}%`;
+  
+  // पाई चार्ट बनाने का कोड
+  const ctx = document.getElementById('resultChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['सही उत्तर', 'गलत उत्तर'],
+      datasets: [{
+        data: [correctCount, incorrectCount],
+        backgroundColor: ['#4CAF50', '#F44336'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'आपके परिणाम',
+          font: {
+            size: 16
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 function populateQuiz() {
@@ -168,6 +274,7 @@ function populateQuiz() {
   if (mode === "input") {
     document.getElementById("inputSection").style.display = "block";
     document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
+    showAllQuestions();
   } else {
     if (questions.length === 0) {
       alert("❗ कोई प्रश्न नहीं मिला!");

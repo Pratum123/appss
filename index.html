@@ -103,6 +103,8 @@
         <option value="">-- विषय चुनें --</option>
       </select>
       <select id="subList"></select>
+      <input id="newSubInput" placeholder="नया उपविषय जोड़ें">
+      <button class="btn" onclick="addSub()">➕ उपविषय जोड़ें</button>
       <button class="btn" onclick="deleteSub()">🖑️ उपविषय हटाएं</button>
     </div>
     <div class="section">
@@ -214,6 +216,25 @@ function deleteSub() {
     populateSubSubjects();
     alert("🗑️ उपविषय हटा दिया गया!");
   }
+}
+function addSub() {
+  const subject = document.getElementById("manageMain").value;
+  const newSub = document.getElementById("newSubInput").value.trim();
+  if (!subject || !newSub) {
+    alert("❗ कृपया विषय और उपविषय भरें");
+    return;
+  }
+  if (!subjects[subject]) subjects[subject] = [];
+  if (subjects[subject].includes(newSub)) {
+    alert("⚠️ यह उपविषय पहले से मौजूद है");
+    return;
+  }
+  subjects[subject].push(newSub);
+  localStorage.setItem("quiz_subjects", JSON.stringify(subjects));
+  document.getElementById("newSubInput").value = "";
+  populateSubList();
+  populateSubSubjects();
+  alert("✅ उपविषय जोड़ा गया!");
 }
 function proceedToAction() {
   const main = document.getElementById("mainSubject").value;

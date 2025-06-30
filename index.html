@@ -14,30 +14,34 @@
     header {
       background: #3949ab;
       color: white;
-      padding: 20px;
-      font-size: 24px;
+      padding: 15px;
+      font-size: 22px;
       text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .container {
       max-width: 500px;
-      margin: 30px auto;
+      margin: 20px auto;
       background: white;
-      padding: 20px;
+      padding: 15px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h1 {
       text-align: center;
       color: #3949ab;
-      font-size: 22px;
+      font-size: 20px;
+      margin: 10px 0;
     }
     select, input, button {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
+      padding: 10px;
+      margin: 8px 0;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
+      font-size: 14px;
       box-sizing: border-box;
     }
     .btn {
@@ -46,27 +50,57 @@
       font-weight: bold;
       border: none;
       cursor: pointer;
+      padding: 10px;
+      margin: 5px 0;
     }
     .section {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px;
     }
     h3 {
-      font-size: 18px;
+      font-size: 16px;
       color: #333;
-      margin-bottom: 10px;
+      margin: 5px 0 10px 0;
+      text-align: center;
     }
     .settings-link {
       text-align: center;
-      margin-top: 10px;
+      margin: 10px 0;
     }
     .settings-link a {
       background: #3949ab;
       color: white;
-      padding: 8px 16px;
+      padding: 6px 12px;
       border-radius: 6px;
       text-decoration: none;
       font-weight: bold;
       display: inline-block;
+      font-size: 14px;
+    }
+    .tab-container {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      background: #e0e0e0;
+      cursor: pointer;
+      border-radius: 5px 5px 0 0;
+      margin: 0 2px;
+    }
+    .tab.active {
+      background: #3949ab;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
   </style>
 </head>
@@ -79,131 +113,134 @@
 
   <div class="container">
     <h1>📚 विषय और उपविषय चयन</h1>
-    <div class="section">
-      <label><strong>मुख्य विषय:</strong></label>
-      <select id="mainSubject" onchange="populateSubSubjects()">
-        <option value="">-- विषय चुनें --</option>
-      </select>
-      <label><strong>उपविषय:</strong></label>
-      <select id="subSubject">
-        <option value="">-- उपविषय चुनें --</option>
-      </select>
-      <button class="btn" onclick="proceedToAction()">👉 आगे बढ़ें</button>
+
+    <div class="tab-container">
+      <div class="tab active" onclick="switchTab('select')">विषय चयन</div>
+      <div class="tab" onclick="switchTab('add')">नया जोड़ें</div>
+      <div class="tab" onclick="switchTab('manage')">प्रबंधन</div>
+      <div class="tab" onclick="switchTab('backup')">बैकअप</div>
     </div>
-    <div class="section">
-      <h3>➕ नया विषय जोड़ें</h3>
-      <input id="newMain" placeholder="मुख्य विषय">
-      <input id="newSubs" placeholder="उपविषय (कॉमा से अलग करें)">
-      <button class="btn" onclick="addNewSubject()">📂 जोड़ें</button>
+
+    <!-- विषय चयन -->
+    <div id="select-tab" class="tab-content active">
+      <div class="section">
+        <label><strong>मुख्य विषय:</strong></label>
+        <select id="mainSubject" onchange="populateSubSubjects()"></select>
+
+        <label><strong>उपविषय:</strong></label>
+        <select id="subSubject"></select>
+
+        <button class="btn" onclick="proceedToAction()">👉 आगे बढ़ें</button>
+      </div>
     </div>
-    <div class="section">
-      <h3>🛠️ उपविषय प्रबंधन</h3>
-      <select id="manageMain" onchange="populateSubList()">
-        <option value="">-- विषय चुनें --</option>
-      </select>
-      <select id="subList"></select>
-      <input id="newSubInput" placeholder="नया उपविषय जोड़ें">
-      <button class="btn" onclick="addSub()">➕ उपविषय जोड़ें</button>
-      <button class="btn" onclick="deleteSub()">🖑️ उपविषय हटाएं</button>
+
+    <!-- नया विषय जोड़ें -->
+    <div id="add-tab" class="tab-content">
+      <div class="section">
+        <input id="newMain" placeholder="मुख्य विषय">
+        <input id="newSubs" placeholder="उपविषय (कॉमा से अलग करें)">
+        <button class="btn" onclick="addNewSubject()">📂 नया विषय जोड़ें</button>
+      </div>
     </div>
-    <div class="section">
-      <h3>☁️ GitHub Gist Sync</h3>
-      <input id="gistToken" placeholder="🔑 GitHub Token">
-      <button class="btn" onclick="saveToken()">🔐 Token सेव करें</button>
-      <button class="btn" onclick="exportToGist()">📂 Gist में सेव करें</button>
-      <input id="gistIdInput" placeholder="🔗 Gist ID डालें">
-      <button class="btn" onclick="importFromGist()">📅 Gist से लोड करें</button>
+
+    <!-- उपविषय प्रबंधन -->
+    <div id="manage-tab" class="tab-content">
+      <div class="section">
+        <select id="manageMain" onchange="populateSubList()"></select>
+        <select id="subList"></select>
+        <input id="newSubInput" placeholder="नया उपविषय जोड़ें">
+        <button class="btn" onclick="addSub()">➕ उपविषय जोड़ें</button>
+        <button class="btn" onclick="deleteSub()">🗑️ उपविषय हटाएं</button>
+      </div>
     </div>
-    <div class="section">
-      <h3>📂 Local JSON Backup</h3>
-      <input type="file" id="importFile" accept=".json" onchange="importData()">
+
+    <!-- लोकल JSON Backup -->
+    <div id="backup-tab" class="tab-content">
+      <div class="section">
+        <input type="file" id="importFile" accept=".json" onchange="importData()">
+        <button class="btn" onclick="exportData()">📥 डेटा निर्यात करें</button>
+      </div>
     </div>
   </div>
 
 <script>
-async function importFromRawURL() {
-  const existingSubjects = localStorage.getItem("quiz_subjects");
-  if (existingSubjects) return;
+let subjects = {};
 
-  try {
-    const res = await fetch("https://raw.githubusercontent.com/Pratum123/asdf/main/quiz_backup.json");
-    if (!res.ok) throw new Error("Network Error");
-    const data = await res.json();
-    if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
-    if (data.main) localStorage.setItem("selectedMain", data.main);
-    if (data.sub) localStorage.setItem("selectedSub", data.sub);
-    if (data.quizData) {
-      for (let key in data.quizData) {
-        localStorage.setItem(key, JSON.stringify(data.quizData[key]));
-      }
-    }
-    console.log("✅ Raw JSON से डेटा लोड हो गया");
-  } catch (e) {
-    console.error("❌ Raw JSON लोड करने में त्रुटि:", e);
+window.onload = () => {
+  if (!localStorage.getItem("quiz_subjects")) {
+    localStorage.setItem("quiz_subjects", JSON.stringify({
+      economics: ["Micro", "Macro"],
+      history: ["Ancient", "Modern"],
+      geography: ["India", "World"]
+    }));
   }
-}
-
-async function autoImportFromGist() {
-  const gistId = localStorage.getItem("gist_id");
-  if (!gistId) return;
-  try {
-    const res = await fetch(`https://api.github.com/gists/${gistId}`);
-    const gist = await res.json();
-    const content = gist.files["quiz_backup.json"].content;
-    const data = JSON.parse(content);
-    if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
-    if (data.main) localStorage.setItem("selectedMain", data.main);
-    if (data.sub) localStorage.setItem("selectedSub", data.sub);
-    if (data.quizData) {
-      for (let key in data.quizData) {
-        localStorage.setItem(key, JSON.stringify(data.quizData[key]));
-      }
-    }
-  } catch (e) {
-    console.error("❌ Gist auto-load error:", e);
-  }
-}
-
-window.onload = async () => {
-  await importFromRawURL();    // ✅ नया जोड़ा गया
-  await autoImportFromGist();  // पहले से मौजूद
-  populateDropdowns();         // विषय दिखाने के लिए
+  subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
+  populateDropdowns();
 };
 
-let subjects = JSON.parse(localStorage.getItem("quiz_subjects") || "{}");
-if (Object.keys(subjects).length === 0) {
-  subjects = {
-    economics: ["Micro", "Macro", "Growth"],
-    history: ["Ancient", "Medieval", "Modern"],
-    geography: ["India", "World"]
-  };
-  localStorage.setItem("quiz_subjects", JSON.stringify(subjects));
+function switchTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // Deactivate all tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Activate selected tab and content
+  document.getElementById(tabName + '-tab').classList.add('active');
+  document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
 }
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
 function populateDropdowns() {
   const main = document.getElementById("mainSubject");
   const manage = document.getElementById("manageMain");
-  main.innerHTML = '<option value="">-- विषय चुनें --</option>';
-  manage.innerHTML = '<option value="">-- विषय चुनें --</option>';
+
+  // Reset
+  main.innerHTML = "";
+  manage.innerHTML = "";
+  document.getElementById("subSubject").innerHTML = '<option value="">-- उपविषय चुनें --</option>';
+  document.getElementById("subList").innerHTML = '<option value="">-- उपविषय चुनें --</option>';
+
+  // Default options
+  main.appendChild(new Option("-- विषय चुनें --", ""));
+  manage.appendChild(new Option("-- विषय चुनें --", ""));
+
   for (let key in subjects) {
-    const opt1 = new Option(capitalize(key), key);
-    const opt2 = new Option(capitalize(key), key);
-    main.appendChild(opt1);
-    manage.appendChild(opt2);
+    main.appendChild(new Option(capitalize(key), key));
+    manage.appendChild(new Option(capitalize(key), key));
   }
 }
+
 function populateSubSubjects() {
   const subject = document.getElementById("mainSubject").value;
   const subs = subjects[subject] || [];
   const subSelect = document.getElementById("subSubject");
-  subSelect.innerHTML = '<option value="">-- उपविषय चुनें --</option>';
+  subSelect.innerHTML = "";
+  subSelect.appendChild(new Option("-- उपविषय चुनें --", ""));
   subs.forEach(sub => {
     subSelect.appendChild(new Option(sub, sub));
   });
 }
+
+function populateSubList() {
+  const subject = document.getElementById("manageMain").value;
+  const list = document.getElementById("subList");
+  list.innerHTML = "";
+  list.appendChild(new Option("-- उपविषय चुनें --", ""));
+  if (subjects[subject]) {
+    subjects[subject].forEach(sub => {
+      list.appendChild(new Option(sub, sub));
+    });
+  }
+}
+
 function addNewSubject() {
   const newMain = document.getElementById("newMain").value.trim().toLowerCase();
   const newSubs = document.getElementById("newSubs").value.split(',').map(s => s.trim()).filter(Boolean);
@@ -217,28 +254,9 @@ function addNewSubject() {
   document.getElementById("newSubs").value = "";
   populateDropdowns();
   alert("✅ नया विषय जोड़ा गया!");
+  switchTab('select');
 }
-function populateSubList() {
-  const selected = document.getElementById("manageMain").value;
-  const list = document.getElementById("subList");
-  list.innerHTML = "";
-  if (subjects[selected]) {
-    subjects[selected].forEach(sub => {
-      list.appendChild(new Option(sub, sub));
-    });
-  }
-}
-function deleteSub() {
-  const subject = document.getElementById("manageMain").value;
-  const sub = document.getElementById("subList").value;
-  if (subject && sub) {
-    subjects[subject] = subjects[subject].filter(s => s !== sub);
-    localStorage.setItem("quiz_subjects", JSON.stringify(subjects));
-    populateSubList();
-    populateSubSubjects();
-    alert("🗑️ उपविषय हटा दिया गया!");
-  }
-}
+
 function addSub() {
   const subject = document.getElementById("manageMain").value;
   const newSub = document.getElementById("newSubInput").value.trim();
@@ -258,6 +276,21 @@ function addSub() {
   populateSubSubjects();
   alert("✅ उपविषय जोड़ा गया!");
 }
+
+function deleteSub() {
+  const subject = document.getElementById("manageMain").value;
+  const sub = document.getElementById("subList").value;
+  if (!subject || !sub) {
+    alert("❗ कृपया विषय और उपविषय चुनें");
+    return;
+  }
+  subjects[subject] = subjects[subject].filter(s => s !== sub);
+  localStorage.setItem("quiz_subjects", JSON.stringify(subjects));
+  populateSubList();
+  populateSubSubjects();
+  alert("🗑️ उपविषय हटा दिया गया!");
+}
+
 function proceedToAction() {
   const main = document.getElementById("mainSubject").value;
   const sub = document.getElementById("subSubject").value;
@@ -269,84 +302,17 @@ function proceedToAction() {
   localStorage.setItem("selectedSub", sub);
   window.location.href = "action.html";
 }
-function saveToken() {
-  const token = document.getElementById("gistToken").value.trim();
-  if (!token) {
-    alert("❗ कृपया GitHub Token दर्ज करें");
-    return;
-  }
-  localStorage.setItem("gist_token", token);
-  alert("✅ Token सुरक्षित किया गया");
-}
-async function exportToGist() {
-  const token = localStorage.getItem("gist_token");
-  if (!token) {
-    alert("❗ पहले GitHub Token सेव करें");
-    return;
-  }
-  const data = {
-    subjects,
-    main: localStorage.getItem("selectedMain"),
-    sub: localStorage.getItem("selectedSub"),
-    quizData: {}
-  };
-  for (let key in localStorage) {
-    if (key.startsWith("quiz_")) {
-      data.quizData[key] = JSON.parse(localStorage.getItem(key));
-    }
-  }
-  const body = {
-    description: "Quiz App Backup",
-    public: false,
-    files: {
-      "quiz_backup.json": {
-        content: JSON.stringify(data, null, 2)
-      }
-    }
-  };
-  const res = await fetch("https://api.github.com/gists", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-  const result = await res.json();
-  if (result.id) {
-    prompt("✅ Gist सफलतापूर्वक बना!\nयह ID सेव करें:", result.id);
-  } else {
-    alert("❌ Gist सेव नहीं हो पाया");
-  }
-}
-async function importFromGist() {
-  const gistId = document.getElementById("gistIdInput").value.trim();
-  if (!gistId) {
-    alert("❗ कृपया Gist ID दर्ज करें");
-    return;
-  }
-  const res = await fetch(`https://api.github.com/gists/${gistId}`);
-  const gist = await res.json();
-  const content = gist.files["quiz_backup.json"].content;
-  const data = JSON.parse(content);
-  if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
-  if (data.main) localStorage.setItem("selectedMain", data.main);
-  if (data.sub) localStorage.setItem("selectedSub", data.sub);
-  if (data.quizData) {
-    for (let key in data.quizData) {
-      localStorage.setItem(key, JSON.stringify(data.quizData[key]));
-    }
-  }
-  alert("✅ Gist डेटा सफलतापूर्वक लोड हुआ!");
-  location.reload();
-}
+
 function importData() {
   const file = document.getElementById("importFile").files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
     const data = JSON.parse(e.target.result);
-    if (data.subjects) localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
+    if (data.subjects) {
+      localStorage.setItem("quiz_subjects", JSON.stringify(data.subjects));
+      subjects = data.subjects;
+    }
     if (data.main) localStorage.setItem("selectedMain", data.main);
     if (data.sub) localStorage.setItem("selectedSub", data.sub);
     if (data.quizData) {
@@ -354,10 +320,37 @@ function importData() {
         localStorage.setItem(key, JSON.stringify(data.quizData[key]));
       }
     }
-    alert("✅ डेटा सफलतापूर्वक लोड हुआ!");
-    location.reload();
+    alert("✅ डेटा लोड हुआ!");
+    populateDropdowns();
   };
   reader.readAsText(file);
+}
+
+function exportData() {
+  const data = {
+    subjects: subjects,
+    main: localStorage.getItem("selectedMain"),
+    sub: localStorage.getItem("selectedSub"),
+    quizData: {}
+  };
+  
+  // Add any additional quiz data you want to export
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith("quiz_") && key !== "quiz_subjects") {
+      data.quizData[key] = JSON.parse(localStorage.getItem(key));
+    }
+  }
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quiz_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>

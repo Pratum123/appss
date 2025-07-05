@@ -3,371 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 प्रश्नोत्तरी ऐप - सुधारित छवि प्रदर्शन</title>
+  <title>📚 प्रश्नोत्तरी ऐप</title>
   <style>
-    * {
-      box-sizing: border-box;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
       margin: 0;
       padding: 0;
     }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      min-height: 100vh;
-      padding: 20px;
-      color: #f0f0f0;
-      line-height: 1.6;
-    }
-    
     header {
-      background: linear-gradient(135deg, #0f3460, #1a1a2e);
+      background: linear-gradient(135deg, #3949ab, #283593);
       color: white;
-      padding: 25px;
-      font-size: 28px;
+      padding: 20px;
+      font-size: 24px;
       text-align: center;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-      border-radius: 0 0 15px 15px;
-      margin-bottom: 30px;
-      position: relative;
-      overflow: hidden;
-      border-bottom: 4px solid #e94560;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
-    header::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0) 70%);
-      transform: rotate(30deg);
-    }
-    
-    .app-container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    
     .section {
-      background: rgba(26, 26, 46, 0.8);
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      max-width: 750px;
       margin: 30px auto;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s ease;
-      border: 1px solid rgba(233, 69, 96, 0.3);
     }
-    
-    .section:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-    
-    .section::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: linear-gradient(90deg, #e94560, #0f3460);
-    }
-    
-    h2, h3 {
-      color: #e94560;
-      text-align: center;
-      margin-bottom: 25px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    
-    h2 {
-      font-size: 26px;
-      position: relative;
-      padding-bottom: 15px;
-    }
-    
-    h2::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 4px;
-      background: linear-gradient(90deg, #e94560, #0f3460);
-      border-radius: 2px;
-    }
-    
     textarea, input, select {
       width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: 1px solid #444;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ddd;
       font-size: 16px;
-      transition: all 0.3s;
-      font-family: inherit;
-      background: rgba(15, 52, 96, 0.5);
-      color: #fff;
+      box-sizing: border-box;
+      transition: border 0.3s;
     }
-    
-    textarea:focus, input:focus, select:focus {
-      border-color: #e94560;
-      box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.3);
-      outline: none;
-    }
-    
-    ::placeholder {
-      color: #aaa;
-    }
-    
     .btn {
-      background: linear-gradient(135deg, #e94560, #c2334d);
+      background: linear-gradient(135deg, #3949ab, #5c6bc0);
       color: white;
       font-weight: bold;
       border: none;
-      padding: 14px 25px;
-      border-radius: 10px;
-      font-size: 17px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
-      margin-top: 15px;
-      transition: all 0.3s;
-      box-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
-      display: block;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
+      margin-top: 10px;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    
-    .btn::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -60%;
-      width: 40%;
-      height: 200%;
-      background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-      transform: rotate(25deg);
-      transition: all 0.4s;
-    }
-    
     .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(233, 69, 96, 0.4);
+      transform: translateY(-2px);
     }
-    
-    .btn:hover::after {
-      left: 120%;
-    }
-    
     .btn-option {
       display: block;
       width: 100%;
       text-align: left;
-      padding: 14px 18px;
-      border-radius: 10px;
-      background: rgba(15, 52, 96, 0.5);
-      border: 1px solid #444;
-      margin: 10px 0;
-      font-size: 17px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      margin: 8px 0;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-      color: #fff;
     }
-    
     .btn-option:hover {
-      background: rgba(15, 52, 96, 0.8);
-      transform: translateX(5px);
-      border-color: #e94560;
+      background: #e9ecef;
     }
-    
-    .btn-option::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 5px;
-      background: #e94560;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .btn-option:hover::before {
-      opacity: 1;
-    }
-    
     .explanation {
-      margin-top: 25px;
-      padding: 20px;
-      border-radius: 10px;
-      background: rgba(15, 52, 96, 0.5);
-      line-height: 1.6;
-      border-left: 4px solid #e94560;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      color: #555;
+      line-height: 1.5;
     }
-    
     .edit-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 2px;
+      right: 2px;
       background: #FFC107;
       color: #000;
       border: none;
-      padding: 5px;
-      border-radius: 50%;
+      padding: 2px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
-      width: 30px;
-      height: 30px;
+      font-size: 10px;
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      z-index: 10;
-      transition: all 0.3s;
     }
-    
-    .edit-btn:hover {
-      transform: rotate(15deg) scale(1.1);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-    }
-    
     .question-item {
-      padding: 15px;
-      border-radius: 10px;
-      background: rgba(15, 52, 96, 0.3);
-      margin: 10px 0;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
       position: relative;
-      transition: all 0.3s;
-      border: 1px solid rgba(233, 69, 96, 0.2);
     }
-    
-    .question-item:hover {
-      background: rgba(15, 52, 96, 0.5);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
     .submit-btn {
-      background: linear-gradient(135deg, #4CAF50, #388E3C);
+      background: linear-gradient(135deg, #4CAF50, #66BB6A);
     }
-    
     .accuracy-display {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 36px;
+      font-size: 32px;
       font-weight: bold;
-      color: #e94560;
+      color: #3949ab;
       text-align: center;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    
     .question-container {
       position: relative;
-      padding: 20px;
-      background: rgba(15, 52, 96, 0.5);
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(233, 69, 96, 0.3);
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    
     .question-text {
       font-weight: bold;
-      margin-bottom: 15px;
-      font-size: 18px;
-      color: #fff;
+      margin-bottom: 10px;
     }
-    
     .statement {
       font-weight: normal;
-      color: #ccc;
-      margin: 8px 0;
-      line-height: 1.5;
+      color: #555;
+      margin: 5px 0;
+      line-height: 1.4;
     }
-    
     .image-preview-container {
-      margin: 20px 0;
+      margin: 15px 0;
       text-align: center;
       width: 100%;
-      height: 200px;
-      border-radius: 12px;
+      height: 200px; /* फिक्स्ड हाइट */
+      border: 1px dashed #ddd;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #000; /* Black background */
-      position: relative;
-      border: none !important; /* Remove border */
     }
-    
     .image-preview {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border-radius: 0; /* Remove border radius */
-      border: none !important; /* Remove border */
     }
-    
     .remove-image-btn {
-      background: #e94560;
+      background: #f44336;
       color: white;
       border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
+      padding: 5px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
-      font-size: 14px;
-      box-shadow: 0 2px 5px rgba(233, 69, 96, 0.3);
-      transition: all 0.3s;
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 10;
+      margin-top: 5px;
+      font-size: 12px;
     }
-    
-    .remove-image-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 3px 8px rgba(233, 69, 96, 0.4);
-    }
-    
     .upload-btn-wrapper {
       position: relative;
       overflow: hidden;
       display: inline-block;
       width: 100%;
     }
-    
     .upload-btn {
-      background: rgba(15, 52, 96, 0.5);
-      color: #64b5f6;
-      border: 2px dashed #64b5f6;
-      padding: 15px;
-      border-radius: 12px;
-      font-size: 17px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px dashed #64b5f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       text-align: center;
-      margin: 15px 0;
+      margin: 10px 0;
       display: block;
       transition: all 0.3s;
     }
-    
     .upload-btn:hover {
-      background: rgba(15, 52, 96, 0.8);
-      transform: translateY(-3px);
-      border-color: #e94560;
-      color: #e94560;
+      background: #bbdefb;
     }
-    
     .upload-btn-wrapper input[type=file] {
       position: absolute;
       left: 0;
@@ -377,219 +188,109 @@
       height: 100%;
       cursor: pointer;
     }
-    
     .question-image-container {
       width: 100%;
-      height: 40vh;
+      height: 50vh; /* 50% व्यूपोर्ट हाइट */
       min-height: 200px;
-      max-height: 400px;
-      margin: 20px 0;
+      max-height: 300px;
+      margin: 15px 0;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #000; /* Black background */
-      border: none !important; /* Remove border */
-      border-radius: 0; /* Remove border radius */
-      box-shadow: none; /* Remove shadow */
-      position: relative;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
     }
-    
     .question-image {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border: none !important; /* Remove border */
-      border-radius: 0; /* Remove border radius */
     }
-    
-    #progress {
-      background: rgba(15, 52, 96, 0.5);
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      color: #e94560;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(233, 69, 96, 0.3);
-    }
-    
-    #gotoContainer {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      align-items: center;
-    }
-    
-    #gotoInput {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-    }
-    
-    #gotoBtn {
-      width: auto;
-      padding: 12px 20px;
-    }
-    
-    .result-card {
-      background: rgba(26, 26, 46, 0.9);
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(233, 69, 96, 0.3);
-    }
-    
-    .result-content {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-      align-items: center;
-      margin: 25px 0;
-    }
-    
-    .stats-box {
-      flex: 1;
-      min-width: 250px;
-      background: rgba(15, 52, 96, 0.5);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(233, 69, 96, 0.3);
-    }
-    
-    .stats-box p {
-      margin: 12px 0;
-      font-size: 17px;
-      display: flex;
-      justify-content: space-between;
-      color: #fff;
-    }
-    
-    .stats-box strong {
-      color: #e94560;
-    }
-    
-    .chart-container {
-      position: relative;
-      width: 280px;
-      height: 280px;
-    }
-    
-    @media (max-width: 650px) {
-      .section {
-        padding: 20px;
-      }
-      
+    @media (max-width: 600px) {
       .result-content {
         flex-direction: column;
       }
-      
-      .stats-box {
-        width: 100%;
-      }
-      
       .question-image-container {
         height: 30vh;
-        max-height: 300px;
+        max-height: 250px;
       }
-      
-      header {
-        font-size: 22px;
-        padding: 20px;
-      }
-    }
-    
-    .footer-note {
-      text-align: center;
-      margin-top: 30px;
-      color: #aaa;
-      font-size: 14px;
-      padding: 20px;
-      border-top: 1px solid rgba(233, 69, 96, 0.2);
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="app-container">
-  <header>📚 प्रश्नोत्तरी ऐप - सुधारित छवि प्रदर्शन</header>
-  <h2 id="pageTitle" style="text-align:center; color:#e94560;"></h2>
+<header>📚 प्रश्नोत्तरी ऐप (छवि सहित)</header>
+<h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
 
-  <div id="inputSection" class="section" style="display:none;">
-    <h3>➕ नया प्रश्न जोड़ें</h3>
-    <textarea id="question" placeholder="प्रश्न लिखें (पहली पंक्ति बोल्ड दिखेगी)" rows="3"></textarea>
-    
-    <div class="upload-btn-wrapper">
-      <div class="upload-btn">
-        <span>📷 छवि अपलोड करें (वैकल्पिक)</span>
-      </div>
-      <input type="file" id="imageUpload" accept="image/*">
+<div id="inputSection" class="section" style="display:none;">
+  <h3>➕ नया प्रश्न जोड़ें</h3>
+  <textarea id="question" placeholder="प्रश्न लिखें (बोल्ड दिखेगा)"></textarea>
+  
+  <div class="upload-btn-wrapper">
+    <div class="upload-btn">
+      <span>📷 छवि अपलोड करें (वैकल्पिक)</span>
     </div>
-    
-    <div class="image-preview-container">
-      <img id="imagePreview" class="image-preview" alt="छवि पूर्वावलोकन">
-      <button id="removeImageBtn" class="remove-image-btn" style="display:none;">❌ छवि हटाएं</button>
-    </div>
-    
-    <input id="optA" placeholder="विकल्प A">
-    <input id="optB" placeholder="विकल्प B">
-    <input id="optC" placeholder="विकल्प C">
-    <input id="optD" placeholder="विकल्प D">
-    <select id="correct">
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-    </select>
-    <textarea id="explanation" placeholder="व्याख्या लिखें (सामान्य टेक्स्ट)" rows="3"></textarea>
-    <button class="btn" onclick="saveQuestion()">📂 प्रश्न सहेजें</button>
-    <div id="questionCount" style="margin-top:20px; font-weight:bold; text-align:center; color:#e94560;"></div>
-    <div id="questionList" style="margin-top:20px;"></div>
+    <input type="file" id="imageUpload" accept="image/*">
   </div>
-
-  <div id="practiceSection" class="section" style="display:none;">
-    <h3>🎯 अभ्यास शुरू करें</h3>
-    <div id="progress"></div>
-    <div id="gotoContainer">
-      <input id="gotoInput" type="number" placeholder="प्रश्न संख्या दर्ज करें">
-      <button id="gotoBtn" onclick="goToQuestion()" class="btn">🔍 जाएं</button>
-    </div>
-    <div id="quizQuestionContainer" style="margin-top:25px;">
-      <div id="quizQuestion" class="question-container"></div>
-    </div>
-    <div id="quizOptions"></div>
+  
+  <div class="image-preview-container">
+    <img id="imagePreview" class="image-preview" alt="छवि पूर्वावलोकन">
+    <button id="removeImageBtn" class="remove-image-btn" style="display:none;">❌ छवि हटाएं</button>
   </div>
+  
+  <input id="optA" placeholder="विकल्प A">
+  <input id="optB" placeholder="विकल्प B">
+  <input id="optC" placeholder="विकल्प C">
+  <input id="optD" placeholder="विकल्प D">
+  <select id="correct">
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+  </select>
+  <textarea id="explanation" placeholder="व्याख्या लिखें (सामान्य टेक्स्ट)"></textarea>
+  <button class="btn" onclick="saveQuestion()">📂 सेव करें</button>
+  <div id="questionCount"></div>
+  <div id="questionList"></div>
+</div>
 
-  <div id="resultSection" class="section" style="display:none;">
-    <div class="result-card">
-      <h3 style="text-align:center; color:#e94560;">📊 आपके परिणाम</h3>
-      <div class="result-content">
-        <div class="stats-box">
+<div id="practiceSection" class="section" style="display:none;">
+  <h3>🎯 अभ्यास शुरू करें</h3>
+  <div id="progress"></div>
+  <div id="gotoContainer" style="margin-top:15px;">
+    <input id="gotoInput" type="number" placeholder="प्रश्न संख्या" style="width:60%; padding:8px;">
+    <button id="gotoBtn" onclick="goToQuestion()" class="btn">🔍 जाएं</button>
+  </div>
+  <div id="quizQuestionContainer" style="margin-top:15px;">
+    <div id="quizQuestion" class="question-container"></div>
+  </div>
+  <div id="quizOptions"></div>
+</div>
+
+<div id="resultSection" class="section" style="display:none;">
+  <div class="result-card">
+    <h3 style="text-align:center; color:#3949ab;">📊 आपके परिणाम</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:center;">
+      <div style="flex:1; min-width:200px;">
+        <div style="background:#f9f9f9; padding:15px; border-radius:8px;">
           <p><strong>📝 कुल प्रश्न:</strong> <span id="totalQuestions">0</span></p>
           <p><strong>✅ सही उत्तर:</strong> <span id="correctAnswers">0</span></p>
           <p><strong>❌ गलत उत्तर:</strong> <span id="incorrectAnswers">0</span></p>
-          <p><strong>📊 सटीकता:</strong> <span id="accuracyPercent" style="font-weight:bold; color:#e94560;">0%</span></p>
-        </div>
-        <div class="chart-container">
-          <canvas id="resultChart"></canvas>
-          <div class="accuracy-display">
-            <span id="bigAccuracy">0%</span>
-            <div style="font-size:16px; color:#aaa;">सटीकता</div>
-          </div>
+          <p><strong>📊 सटीकता:</strong> <span id="accuracyPercent" style="font-weight:bold; color:#3949ab;">0%</span></p>
         </div>
       </div>
-      <button class="btn" onclick="window.location.reload()" style="margin-top:30px;">
-        🏠 मुख्य पेज पर वापस जाएं
-      </button>
+      <div style="position:relative; width:250px; height:250px;">
+        <canvas id="resultChart"></canvas>
+        <div class="accuracy-display">
+          <span id="bigAccuracy">0%</span>
+          <div style="font-size:14px; color:#666;">सटीकता</div>
+        </div>
+      </div>
     </div>
-  </div>
-  
-  <div class="footer-note">
-    प्रश्नोत्तरी ऐप - छवियाँ काले पृष्ठभूमि पर बिना बॉर्डर के प्रदर्शित होती हैं
+    <button class="btn" onclick="window.location.href='index.html'" style="margin-top:25px; width:100%;">
+      🏠 मुख्य पेज पर वापस जाएं
+    </button>
   </div>
 </div>
 
@@ -601,7 +302,6 @@ let incorrectCount = 0;
 let editIndex = -1;
 let currentImage = null;
 
-// Initialize event listeners
 document.getElementById("imageUpload").addEventListener("change", function(event) {
   const file = event.target.files[0];
   if (file) {
@@ -624,7 +324,6 @@ document.getElementById("removeImageBtn").addEventListener("click", function() {
   document.getElementById("imageUpload").value = "";
 });
 
-// Save question function
 function saveQuestion() {
   const q = document.getElementById("question").value.trim();
   const A = document.getElementById("optA").value.trim();
@@ -635,7 +334,7 @@ function saveQuestion() {
   const exp = document.getElementById("explanation").value.trim();
   
   if (!q || !A || !B || !C || !D || !correct) {
-    alert("❗ कृपया सभी आवश्यक फ़ील्ड भरें!");
+    alert("❗ सभी फ़ील्ड भरें!");
     return;
   }
   
@@ -650,16 +349,15 @@ function saveQuestion() {
   if (editIndex >= 0) {
     questions[editIndex] = newQ;
     editIndex = -1;
-    alert("✅ प्रश्न सफलतापूर्वक अपडेट किया गया!");
+    alert("✅ प्रश्न अपडेट हो गया!");
   } else {
     questions.push(newQ);
-    alert("✅ नया प्रश्न सफलतापूर्वक जोड़ा गया!");
+    alert("✅ नया प्रश्न जोड़ा गया!");
   }
   
   const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
   localStorage.setItem(currentKey, JSON.stringify(questions));
   
-  // Reset form
   document.getElementById("question").value = '';
   document.getElementById("optA").value = '';
   document.getElementById("optB").value = '';
@@ -675,20 +373,13 @@ function saveQuestion() {
   document.getElementById("removeImageBtn").style.display = "none";
   document.getElementById("imageUpload").value = "";
   
-  // Update UI
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
   showAllQuestions();
 }
 
-// Show all questions in list
 function showAllQuestions() {
   const listDiv = document.getElementById("questionList");
   listDiv.innerHTML = '';
-  
-  if (questions.length === 0) {
-    listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">❌ कोई प्रश्न नहीं मिला। कृपया प्रश्न जोड़ें।</div>';
-    return;
-  }
   
   questions.forEach((q, index) => {
     const div = document.createElement("div");
@@ -696,18 +387,18 @@ function showAllQuestions() {
     div.innerHTML = `
       <div style="position:relative;">
         <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>
-        <div class="question-text">प्रश्न ${index + 1}: ${formatQuestionText(q.question)}</div>
-        ${q.image ? '<div style="font-size:14px; color:#e94560; margin-top:10px;">📷 छवि जुड़ी हुई है</div>' : ''}
+        <div class="question-text">Q${index + 1}: ${formatQuestionText(q.question)}</div>
+        ${q.image ? '<div style="font-size:12px; color:#666; margin-top:5px;">📷 छवि जुड़ी हुई है</div>' : ''}
       </div>
     `;
     listDiv.appendChild(div);
   });
 }
 
-// Format question text with bold first line
 function formatQuestionText(text) {
+  // स्टेटमेंट्स को अलग करने के लिए (जो बोल्ड नहीं होंगे)
   const parts = text.split('\n');
-  let result = `<strong>${parts[0]}</strong>`;
+  let result = `<strong>${parts[0]}</strong>`; // पहली लाइन हमेशा बोल्ड
   
   if (parts.length > 1) {
     for (let i = 1; i < parts.length; i++) {
@@ -720,7 +411,6 @@ function formatQuestionText(text) {
   return result;
 }
 
-// Edit question
 function editQuestion(index) {
   const q = questions[index];
   document.getElementById("question").value = q.question;
@@ -747,12 +437,8 @@ function editQuestion(index) {
   document.getElementById("inputSection").style.display = "block";
   document.getElementById("practiceSection").style.display = "none";
   document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
 }
 
-// Edit current question in practice mode
 function editCurrentQuestion() {
   const q = questions[currentQuestion];
   
@@ -780,23 +466,18 @@ function editCurrentQuestion() {
   
   editIndex = currentQuestion;
   document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
 }
 
-// Go to specific question
 function goToQuestion() {
   const input = parseInt(document.getElementById("gotoInput").value);
   if (!input || input < 1 || input > questions.length) {
-    alert(`⚠️ कृपया 1 से ${questions.length} के बीच एक मान्य प्रश्न संख्या दर्ज करें`);
+    alert(`⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से ${questions.length} के बीच)`);
     return;
   }
   currentQuestion = input - 1;
   showQuestion();
 }
 
-// Show current question in practice mode
 function showQuestion() {
   const q = questions[currentQuestion];
   
@@ -831,19 +512,18 @@ function showQuestion() {
   }
   
   const submitBtn = document.createElement("button");
-  submitBtn.textContent = "✅ क्विज समाप्त करें और परिणाम देखें";
+  submitBtn.textContent = "✅ क्विज सबमिट करें";
   submitBtn.className = "btn submit-btn";
   submitBtn.onclick = () => {
-    if (confirm(`क्या आप वाकई क्विज समाप्त करना चाहते हैं?\nआपने ${correctCount + incorrectCount} प्रश्नों के उत्तर दिए हैं।`)) {
+    if (confirm(`क्या आप वाकई क्विज सबमिट करना चाहते हैं?\nआपने ${correctCount + incorrectCount} प्रश्नों के उत्तर दिए हैं।`)) {
       submitQuiz();
     }
   };
   optionsDiv.appendChild(submitBtn);
   
-  document.getElementById("progress").textContent = `📘 प्रगति: ${currentQuestion + 1} / ${questions.length}`;
+  document.getElementById("progress").textContent = `📘 ${currentQuestion + 1} / ${questions.length}`;
 }
 
-// Handle user answer
 function handleAnswer(selected) {
   const q = questions[currentQuestion];
   const optionsDiv = document.getElementById("quizOptions");
@@ -863,7 +543,7 @@ function handleAnswer(selected) {
   
   const expl = document.createElement("div");
   expl.className = "explanation";
-  expl.innerHTML = `<strong>📘 व्याख्या:</strong><br>${(q.explanation || 'इस प्रश्न के लिए कोई व्याख्या उपलब्ध नहीं है').replace(/\n/g, "<br>")}`;
+  expl.innerHTML = `<strong>📘 व्याख्या:</strong><br>${(q.explanation || 'कोई व्याख्या नहीं दी गई है').replace(/\n/g, "<br>")}`;
   optionsDiv.appendChild(expl);
   
   if (selected === q.correct) {
@@ -873,9 +553,9 @@ function handleAnswer(selected) {
   }
   
   const nextBtn = document.createElement("button");
-  nextBtn.textContent = currentQuestion < questions.length - 1 ? "➡️ अगला प्रश्न" : "✅ क्विज समाप्त करें";
+  nextBtn.textContent = currentQuestion < questions.length - 1 ? "➡️ अगला प्रश्न" : "✅ क्विज सबमिट करें";
   nextBtn.className = "btn";
-  nextBtn.style.marginTop = "25px";
+  nextBtn.style.marginTop = "20px";
   nextBtn.onclick = () => {
     currentQuestion++;
     if (currentQuestion >= questions.length) submitQuiz();
@@ -884,7 +564,6 @@ function handleAnswer(selected) {
   optionsDiv.appendChild(nextBtn);
 }
 
-// Submit quiz and show results
 function submitQuiz() {
   const totalAnswered = correctCount + incorrectCount;
   const totalQuestions = questions.length;
@@ -904,37 +583,23 @@ function submitQuiz() {
       datasets: [{
         data: [correctCount, incorrectCount],
         backgroundColor: ['#4CAF50', '#F44336'],
-        borderWidth: 0,
-        hoverOffset: 15
+        borderWidth: 0
       }]
     },
     options: {
       cutout: '65%',
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: {
-            font: {
-              size: 14
-            }
-          }
+          position: 'bottom'
         }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true
       }
     }
   });
   
   document.getElementById("practiceSection").style.display = "none";
   document.getElementById("resultSection").style.display = "block";
-  
-  // Scroll to results
-  document.getElementById("resultSection").scrollIntoView({ behavior: 'smooth' });
 }
 
-// Initialize quiz
 function populateQuiz() {
   const main = localStorage.getItem("selectedMain");
   const sub = localStorage.getItem("selectedSub");
@@ -948,7 +613,7 @@ function populateQuiz() {
   editIndex = -1;
   currentImage = null;
   
-  document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 प्रश्नोत्तरी अभ्यास";
+  document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
   
   if (mode === "input") {
     document.getElementById("inputSection").style.display = "block";
@@ -956,11 +621,8 @@ function populateQuiz() {
     showAllQuestions();
   } else {
     if (questions.length === 0) {
-      alert("❗ इस क्विज के लिए कोई प्रश्न नहीं मिला!");
-      document.getElementById("inputSection").style.display = "block";
-      document.getElementById("pageTitle").textContent = "➕ प्रश्न जोड़ें";
-      document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: 0`;
-      showAllQuestions();
+      alert("❗ कोई प्रश्न नहीं मिला!");
+      window.location.href = "index.html";
     } else {
       document.getElementById("practiceSection").style.display = "block";
       showQuestion();
@@ -978,53 +640,6 @@ window.onload = function() {
   }
   
   populateQuiz();
-  
-  // Add some sample questions if empty
-  if (questions.length === 0) {
-    questions = [
-      {
-        question: "HTML में किस टैग का उपयोग पैराग्राफ बनाने के लिए किया जाता है?",
-        options: {
-          A: "<p>",
-          B: "<para>",
-          C: "<paragraph>",
-          D: "<pg>"
-        },
-        correct: "A",
-        explanation: "HTML में पैराग्राफ बनाने के लिए <p> टैग का उपयोग किया जाता है।",
-        image: null
-      },
-      {
-        question: "CSS में किस प्रॉपर्टी का उपयोग टेक्स्ट का रंग बदलने के लिए किया जाता है?",
-        options: {
-          A: "text-color",
-          B: "font-color",
-          C: "color",
-          D: "text-style"
-        },
-        correct: "C",
-        explanation: "CSS में टेक्स्ट का रंग बदलने के लिए 'color' प्रॉपर्टी का उपयोग किया जाता है।",
-        image: null
-      },
-      {
-        question: "JavaScript में किस फ़ंक्शन का उपयोग कंसोल पर आउटपुट प्रदर्शित करने के लिए किया जाता है?",
-        options: {
-          A: "print()",
-          B: "display()",
-          C: "console.log()",
-          D: "output()"
-        },
-        correct: "C",
-        explanation: "JavaScript में कंसोल पर आउटपुट प्रदर्शित करने के लिए console.log() फ़ंक्शन का उपयोग किया जाता है।",
-        image: null
-      }
-    ];
-    
-    const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
-    localStorage.setItem(currentKey, JSON.stringify(questions));
-    document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
-    showAllQuestions();
-  }
 };
 </script>
 </body>

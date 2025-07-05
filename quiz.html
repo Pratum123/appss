@@ -111,12 +111,6 @@
       color: #3949ab;
       text-align: center;
     }
-    .result-card {
-      background: white;
-      border-radius: 10px;
-      padding: 25px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    }
     .question-container {
       position: relative;
       padding: 15px;
@@ -135,21 +129,116 @@
       margin: 5px 0;
       line-height: 1.4;
     }
+    .image-preview-container {
+      margin: 15px 0;
+      text-align: center;
+      width: 100%;
+      height: 200px; /* फिक्स्ड हाइट */
+      border: 1px dashed #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .image-preview {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .remove-image-btn {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+    .upload-btn-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    .upload-btn {
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px dashed #64b5f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      margin: 10px 0;
+      display: block;
+      transition: all 0.3s;
+    }
+    .upload-btn:hover {
+      background: #bbdefb;
+    }
+    .upload-btn-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .question-image-container {
+      width: 100%;
+      height: 50vh; /* 50% व्यूपोर्ट हाइट */
+      min-height: 200px;
+      max-height: 300px;
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+    }
+    .question-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
     @media (max-width: 600px) {
       .result-content {
         flex-direction: column;
+      }
+      .question-image-container {
+        height: 30vh;
+        max-height: 250px;
       }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<header>📚 प्रश्नोत्तरी ऐप</header>
+<header>📚 प्रश्नोत्तरी ऐप (छवि सहित)</header>
 <h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
 
 <div id="inputSection" class="section" style="display:none;">
   <h3>➕ नया प्रश्न जोड़ें</h3>
   <textarea id="question" placeholder="प्रश्न लिखें (बोल्ड दिखेगा)"></textarea>
+  
+  <div class="upload-btn-wrapper">
+    <div class="upload-btn">
+      <span>📷 छवि अपलोड करें (वैकल्पिक)</span>
+    </div>
+    <input type="file" id="imageUpload" accept="image/*">
+  </div>
+  
+  <div class="image-preview-container">
+    <img id="imagePreview" class="image-preview" alt="छवि पूर्वावलोकन">
+    <button id="removeImageBtn" class="remove-image-btn" style="display:none;">❌ छवि हटाएं</button>
+  </div>
+  
   <input id="optA" placeholder="विकल्प A">
   <input id="optB" placeholder="विकल्प B">
   <input id="optC" placeholder="विकल्प C">
@@ -211,6 +300,29 @@ let currentQuestion = 0;
 let correctCount = 0;
 let incorrectCount = 0;
 let editIndex = -1;
+let currentImage = null;
+
+document.getElementById("imageUpload").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentImage = e.target.result;
+      document.getElementById("imagePreview").src = currentImage;
+      document.getElementById("imagePreview").style.display = "block";
+      document.getElementById("removeImageBtn").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById("removeImageBtn").addEventListener("click", function() {
+  currentImage = null;
+  document.getElementById("imagePreview").src = "";
+  document.getElementById("imagePreview").style.display = "none";
+  document.getElementById("removeImageBtn").style.display = "none";
+  document.getElementById("imageUpload").value = "";
+});
 
 function saveQuestion() {
   const q = document.getElementById("question").value.trim();
@@ -230,7 +342,8 @@ function saveQuestion() {
     question: q,
     options: { A, B, C, D },
     correct,
-    explanation: exp
+    explanation: exp,
+    image: currentImage
   };
   
   if (editIndex >= 0) {
@@ -253,6 +366,13 @@ function saveQuestion() {
   document.getElementById("explanation").value = '';
   document.getElementById("correct").value = 'A';
   
+  // Reset image fields
+  currentImage = null;
+  document.getElementById("imagePreview").src = "";
+  document.getElementById("imagePreview").style.display = "none";
+  document.getElementById("removeImageBtn").style.display = "none";
+  document.getElementById("imageUpload").value = "";
+  
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
   showAllQuestions();
 }
@@ -268,6 +388,7 @@ function showAllQuestions() {
       <div style="position:relative;">
         <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>
         <div class="question-text">Q${index + 1}: ${formatQuestionText(q.question)}</div>
+        ${q.image ? '<div style="font-size:12px; color:#666; margin-top:5px;">📷 छवि जुड़ी हुई है</div>' : ''}
       </div>
     `;
     listDiv.appendChild(div);
@@ -299,6 +420,18 @@ function editQuestion(index) {
   document.getElementById("optD").value = q.options.D;
   document.getElementById("correct").value = q.correct;
   document.getElementById("explanation").value = q.explanation;
+  
+  if (q.image) {
+    currentImage = q.image;
+    document.getElementById("imagePreview").src = q.image;
+    document.getElementById("imagePreview").style.display = "block";
+    document.getElementById("removeImageBtn").style.display = "block";
+  } else {
+    currentImage = null;
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("removeImageBtn").style.display = "none";
+  }
+  
   editIndex = index;
   
   document.getElementById("inputSection").style.display = "block";
@@ -320,6 +453,17 @@ function editCurrentQuestion() {
   document.getElementById("correct").value = q.correct;
   document.getElementById("explanation").value = q.explanation;
   
+  if (q.image) {
+    currentImage = q.image;
+    document.getElementById("imagePreview").src = q.image;
+    document.getElementById("imagePreview").style.display = "block";
+    document.getElementById("removeImageBtn").style.display = "block";
+  } else {
+    currentImage = null;
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("removeImageBtn").style.display = "none";
+  }
+  
   editIndex = currentQuestion;
   document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
 }
@@ -337,10 +481,20 @@ function goToQuestion() {
 function showQuestion() {
   const q = questions[currentQuestion];
   
+  let imageHTML = '';
+  if (q.image) {
+    imageHTML = `
+      <div class="question-image-container">
+        <img src="${q.image}" class="question-image" alt="प्रश्न छवि">
+      </div>
+    `;
+  }
+  
   const quizQuestionHTML = `
     <div id="quizQuestion" class="question-container">
       <button class="edit-btn" onclick="editCurrentQuestion()">✏️</button>
       <div class="question-text">📘 प्रश्न ${currentQuestion + 1}/${questions.length}: ${formatQuestionText(q.question)}</div>
+      ${imageHTML}
     </div>
   `;
   
@@ -457,6 +611,7 @@ function populateQuiz() {
   correctCount = 0;
   incorrectCount = 0;
   editIndex = -1;
+  currentImage = null;
   
   document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
   
@@ -475,7 +630,17 @@ function populateQuiz() {
   }
 }
 
-window.onload = populateQuiz;
+// Initialize the app
+window.onload = function() {
+  // For demo purposes - initialize localStorage if not set
+  if (!localStorage.getItem("selectedMain")) {
+    localStorage.setItem("selectedMain", "demo");
+    localStorage.setItem("selectedSub", "demo");
+    localStorage.setItem("quizMode", "input");
+  }
+  
+  populateQuiz();
+};
 </script>
 </body>
 </html>

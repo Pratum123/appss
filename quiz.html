@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 प्रश्नोत्तरी ऐप - सुधारित</title>
+  <title>📚 प्रश्नोत्तरी ऐप (JSON आयात सपोर्ट)</title>
   <style>
     body {
-      font-family: 'Segoe UI', 'Nirmala UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #e4e7f0);
       margin: 0;
       padding: 0;
       color: #333;
@@ -18,163 +18,145 @@
       padding: 20px;
       font-size: 24px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       position: relative;
-      overflow: hidden;
-    }
-    header::before {
-      content: "";
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-      z-index: 0;
     }
     .section {
       background: white;
       padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      max-width: 750px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      max-width: 850px;
       margin: 30px auto;
-      position: relative;
-      border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
     }
     textarea, input, select {
       width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 10px;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
       border: 1px solid #ddd;
       font-size: 16px;
       box-sizing: border-box;
-      transition: all 0.3s;
-      font-family: inherit;
+      transition: border 0.3s;
     }
     textarea:focus, input:focus, select:focus {
       border-color: #3949ab;
-      box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.2);
       outline: none;
+      box-shadow: 0 0 0 2px rgba(57, 73, 171, 0.2);
     }
     .btn {
       background: linear-gradient(135deg, #3949ab, #5c6bc0);
       color: white;
       font-weight: bold;
       border: none;
-      padding: 14px 25px;
-      border-radius: 10px;
-      font-size: 17px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
-      margin-top: 15px;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-top: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       display: inline-block;
-      font-family: inherit;
     }
     .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     .btn-option {
       display: block;
       width: 100%;
       text-align: left;
-      padding: 14px 20px;
-      border-radius: 10px;
+      padding: 12px 15px;
+      border-radius: 8px;
       background: #f8f9fa;
       border: 1px solid #e0e0e0;
-      margin: 10px 0;
-      font-size: 17px;
+      margin: 8px 0;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s;
-      font-family: inherit;
     }
     .btn-option:hover {
       background: #e9ecef;
-      border-color: #d0d0d0;
+      transform: translateX(5px);
     }
     .explanation {
-      margin-top: 25px;
-      padding-top: 20px;
+      margin-top: 20px;
+      padding-top: 15px;
       border-top: 1px solid #eee;
       color: #555;
-      line-height: 1.6;
-      font-size: 16px;
+      line-height: 1.5;
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
     }
     .edit-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 2px;
+      right: 2px;
       background: #FFC107;
       color: #000;
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 2px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 10px;
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: all 0.2s;
-    }
-    .edit-btn:hover {
-      background: #ffb300;
     }
     .question-item {
-      padding: 15px 0;
+      padding: 12px 0;
       border-bottom: 1px solid #eee;
       position: relative;
-      transition: background 0.3s;
-    }
-    .question-item:hover {
-      background-color: #f9f9f9;
     }
     .submit-btn {
       background: linear-gradient(135deg, #4CAF50, #66BB6A);
+    }
+    .delete-btn {
+      background: linear-gradient(135deg, #f44336, #e53935);
     }
     .accuracy-display {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 36px;
+      font-size: 32px;
       font-weight: bold;
       color: #3949ab;
       text-align: center;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .question-container {
       position: relative;
-      padding: 20px;
+      padding: 15px;
       background: #fff;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 4px solid #3949ab;
     }
     .question-text {
       font-weight: bold;
-      margin-bottom: 15px;
-      font-size: 18px;
-      line-height: 1.5;
+      margin-bottom: 10px;
+      color: #2c3e50;
     }
     .statement {
       font-weight: normal;
       color: #555;
-      margin: 8px 0;
-      line-height: 1.5;
-      font-size: 16px;
+      margin: 5px 0;
+      line-height: 1.4;
+      padding-left: 15px;
+      border-left: 2px solid #e0e0e0;
     }
     .image-preview-container {
-      margin: 20px 0;
+      margin: 15px 0;
       text-align: center;
       width: 100%;
-      height: 220px;
-      border: 2px dashed #ddd;
-      border-radius: 12px;
+      height: 200px;
+      border: 1px dashed #ddd;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -190,34 +172,29 @@
       background: #f44336;
       color: white;
       border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
+      padding: 5px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
-      font-size: 14px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: all 0.2s;
-    }
-    .remove-image-btn:hover {
-      background: #e53935;
+      margin-top: 5px;
+      font-size: 12px;
     }
     .upload-btn-wrapper {
       position: relative;
       overflow: hidden;
       display: inline-block;
       width: 100%;
-      margin: 10px 0;
     }
     .upload-btn {
       background: #e3f2fd;
       color: #1976d2;
-      border: 2px dashed #64b5f6;
-      padding: 20px;
-      border-radius: 12px;
-      font-size: 17px;
+      border: 1px dashed #64b5f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       text-align: center;
+      margin: 10px 0;
       display: block;
       transition: all 0.3s;
     }
@@ -236,335 +213,196 @@
     .question-image-container {
       width: 100%;
       height: 50vh;
-      min-height: 250px;
-      max-height: 350px;
-      margin: 20px 0;
+      min-height: 200px;
+      max-height: 300px;
+      margin: 15px 0;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: 8px;
       background: #f8f9fa;
       border: 1px solid #e0e0e0;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
     .question-image {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
     }
-    .paste-section {
-      background: #e3f2fd;
-      padding: 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      border-left: 5px solid #3949ab;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-    }
-    .paste-btn {
-      background: linear-gradient(135deg, #2196F3, #21CBF3);
-      color: white;
-      width: 100%;
-      padding: 15px;
-      font-size: 18px;
-      margin-top: 15px;
-    }
-    .paste-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(33, 150, 243, 0.25);
-    }
-    .format-example {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      font-size: 14px;
-      border: 1px solid #bbdefb;
-    }
-    .format-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #1976d2;
+    .action-buttons {
       display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .action-buttons .btn {
+      flex: 1;
+    }
+    .db-info {
+      background: #e3f2fd;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
     }
-    .format-title svg {
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
       margin-right: 8px;
     }
-    .highlight-box {
-      background: #fffde7;
-      border: 1px solid #ffecb3;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 15px 0;
+    .status-connected {
+      background: #4CAF50;
     }
-    .tab-container {
+    .status-disconnected {
+      background: #f44336;
+    }
+    .backup-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .backup-title {
+      text-align: center;
+      color: #3949ab;
+      margin-bottom: 15px;
+    }
+    .backup-actions {
       display: flex;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #e0e0e0;
+      gap: 10px;
+      margin-top: 15px;
     }
-    .tab {
-      padding: 12px 25px;
-      cursor: pointer;
-      font-weight: bold;
-      border-radius: 8px 8px 0 0;
-      background: #f5f5f5;
-      margin-right: 5px;
-      transition: all 0.3s;
-    }
-    .tab.active {
-      background: #3949ab;
-      color: white;
+    .backup-actions .btn {
+      flex: 1;
     }
     @media (max-width: 600px) {
-      .section {
-        padding: 20px 15px;
-        margin: 20px 10px;
+      .result-content {
+        flex-direction: column;
       }
       .question-image-container {
-        height: 35vh;
+        height: 30vh;
         max-height: 250px;
       }
-      .btn {
-        padding: 12px 20px;
-        font-size: 16px;
+      .section {
+        padding: 15px;
+        margin: 15px;
       }
-    }
-    .welcome-container {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .welcome-title {
-      font-size: 32px;
-      color: #3949ab;
-      margin-bottom: 20px;
-    }
-    .welcome-description {
-      font-size: 18px;
-      color: #555;
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
-    .mode-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-    .mode-btn {
-      padding: 18px 35px;
-      font-size: 20px;
-      min-width: 250px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    .mode-btn i {
-      font-size: 36px;
-    }
-    .feature-box {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin: 20px 0;
-      padding: 15px;
-      background: #f9f9f9;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .feature-icon {
-      font-size: 24px;
-      color: #3949ab;
-      min-width: 40px;
-    }
-    .success-message {
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      text-align: center;
-      font-weight: bold;
-    }
-    .error-message {
-      background-color: #f44336;
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      text-align: center;
-      font-weight: bold;
+      .action-buttons {
+        flex-direction: column;
+      }
+      .backup-actions {
+        flex-direction: column;
+      }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <header>
-  <div style="max-width: 800px; margin: 0 auto;">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
-      <div style="font-size: 36px;">📚</div>
-      <div>
-        <div>प्रश्नोत्तरी ऐप - सुधारित</div>
-        <div style="font-size: 18px; opacity: 0.9; margin-top: 5px;">पेस्ट सुविधा में सुधार किया गया</div>
-      </div>
-    </div>
-  </div>
+  <div>📚 प्रश्नोत्तरी ऐप (JSON आयात सपोर्ट)</div>
+  <div style="font-size: 16px; margin-top: 10px;">अब JSON फ़ाइलों से प्रश्न आयात कर सकते हैं</div>
 </header>
-
-<div id="welcomeSection" class="section">
-  <div class="welcome-container">
-    <h1 class="welcome-title">प्रश्नोत्तरी ऐप में आपका स्वागत है</h1>
-    <p class="welcome-description">अब पेस्ट करने के बाद "सभी फ़ील्ड भरें" की समस्या हल हो गई है!</p>
-    
-    <div class="success-message">
-      <i class="fas fa-check-circle"></i> पेस्ट करने के बाद सेव करने की समस्या हल कर दी गई है
-    </div>
-    
-    <div class="mode-buttons">
-      <button class="btn mode-btn" onclick="startQuiz('input')">
-        <i class="fas fa-plus-circle"></i>
-        <span>प्रश्न जोड़ें</span>
-      </button>
-      <button class="btn mode-btn" onclick="startQuiz('practice')">
-        <i class="fas fa-brain"></i>
-        <span>अभ्यास शुरू करें</span>
-      </button>
-    </div>
-    
-    <div style="margin-top: 50px; text-align: left;">
-      <h3 style="color: #3949ab; border-bottom: 2px solid #3949ab; padding-bottom: 10px;">ऐप की विशेषताएं:</h3>
-      
-      <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-paste"></i></div>
-        <div>
-          <h4>प्रश्न ब्लॉक पेस्ट करें</h4>
-          <p>सुधारित पार्सिंग से अब कोई त्रुटि नहीं</p>
-        </div>
-      </div>
-      
-      <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
-        <div>
-          <h4>सुधारित सेव फीचर</h4>
-          <p>पेस्ट करने के बाद अब "सभी फ़ील्ड भरें" की समस्या नहीं</p>
-        </div>
-      </div>
-      
-      <div class="feature-box">
-        <div class="feature-icon"><i class="fas fa-image"></i></div>
-        <div>
-          <h4>छवियाँ जोड़ें</h4>
-          <p>अपने प्रश्नों में छवियाँ अपलोड करें</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<h2 id="pageTitle" style="text-align:center; color:#3949ab;"></h2>
 
 <div id="inputSection" class="section" style="display:none;">
-  <div class="tab-container">
-    <div class="tab active" onclick="showTab('addTab')">➕ प्रश्न जोड़ें</div>
-    <div class="tab" onclick="showTab('pasteTab')">📋 प्रश्न पेस्ट करें</div>
-  </div>
+  <h3>➕ नया प्रश्न जोड़ें</h3>
+  <textarea id="question" placeholder="प्रश्न लिखें (बोल्ड दिखेगा)"></textarea>
   
-  <div id="pasteTab" style="display:none;">
-    <div class="paste-section">
-      <h3><i class="fas fa-paste"></i> प्रश्नों का ब्लॉक पेस्ट करें</h3>
-      <textarea id="pasteArea" placeholder="यहाँ प्रश्नों का ब्लॉक पेस्ट करें:
-उदाहरण:
-प्रश्न टेक्सट
-(A) विकल्प A
-(B) विकल्प B
-(C) विकल्प C
-(D) विकल्प D
-✅ सही उत्तर: (A)
-📘 व्याख्या: यहाँ व्याख्या" 
-                rows="8" style="font-family: monospace; padding: 15px;"></textarea>
-      
-      <div class="highlight-box">
-        <div class="format-title">
-          <i class="fas fa-info-circle"></i> फॉर्मेट नोट्स
-        </div>
-        <ul style="margin: 10px 0; padding-left: 20px;">
-          <li>पहली लाइन: प्रश्न टेक्स्ट</li>
-          <li>अगली 4 लाइनें: (A), (B), (C), (D) विकल्प</li>
-          <li>✅ सही उत्तर: (X) फॉर्मेट में (जहाँ X A, B, C या D है)</li>
-          <li>📘 व्याख्या: के बाद व्याख्या (एक या अधिक लाइन)</li>
-        </ul>
-      </div>
-      
-      <button class="btn paste-btn" onclick="parsePastedText()">
-        <i class="fas fa-magic"></i> पेस्ट किए गए टेक्स्ट को पार्स करें
-      </button>
-      
-      <div class="format-example">
-        <div class="format-title">
-          <i class="fas fa-lightbulb"></i> उदाहरण:
-        </div>
-        <pre style="margin: 0; font-family: monospace; white-space: pre-wrap;">
-Phillips Curve को अर्थशास्त्र में क्यों महत्त्वपूर्ण माना जाता है?
-(A) यह मुद्रा आपूर्ति दर्शाता है
-(B) यह राजकोषीय घाटे की गणना करता है
-(C) यह मुद्रास्फीति और बेरोजगारी के बीच संबंध बताता है
-(D) यह केवल दीर्घकालिक निवेश रणनीति है
-✅ सही उत्तर: (C)
-📘 व्याख्या:
-Phillips Curve का महत्व इस कारण है क्योंकि यह नीति-निर्माताओं को यह समझने में मदद करता है कि एक लक्ष्य (जैसे बेरोज़गारी कम करना) हासिल करने पर दूसरे क्षेत्र (जैसे मुद्रास्फीति) में क्या प्रभाव पड़ सकता है।</pre>
-      </div>
+  <div class="upload-btn-wrapper">
+    <div class="upload-btn">
+      <span>📷 छवि अपलोड करें (वैकल्पिक)</span>
     </div>
+    <input type="file" id="imageUpload" accept="image/*">
   </div>
   
-  <div id="addTab">
-    <h3><i class="fas fa-plus-circle"></i> नया प्रश्न जोड़ें</h3>
-    <textarea id="question" placeholder="प्रश्न लिखें (बोल्ड दिखेगा)"></textarea>
+  <div class="image-preview-container">
+    <img id="imagePreview" class="image-preview" alt="छवि पूर्वावलोकन">
+    <button id="removeImageBtn" class="remove-image-btn" style="display:none;">❌ छवि हटाएं</button>
+  </div>
+  
+  <input id="optA" placeholder="विकल्प A">
+  <input id="optB" placeholder="विकल्प B">
+  <input id="optC" placeholder="विकल्प C">
+  <input id="optD" placeholder="विकल्प D">
+  <select id="correct">
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+  </select>
+  <textarea id="explanation" placeholder="व्याख्या लिखें (सामान्य टेक्स्ट)"></textarea>
+  
+  <div class="action-buttons">
+    <button class="btn" onclick="saveQuestion()">💾 सेव करें</button>
+    <button class="btn delete-btn" onclick="clearForm()">🗑️ फॉर्म साफ़ करें</button>
+  </div>
+  
+  <div class="db-info">
+    <div>
+      <span class="status-indicator status-connected" id="dbStatus"></span>
+      <span>IndexedDB कनेक्टेड</span>
+    </div>
+    <div id="storageInfo">स्टोरेज उपयोग: लोड हो रहा है...</div>
+  </div>
+  
+  <div id="questionCount"></div>
+  <div id="questionList"></div>
+  
+  <!-- JSON बैकअप और आयात सेक्शन -->
+  <div class="backup-section">
+    <h3 class="backup-title">📥 JSON बैकअप और आयात</h3>
+    <p style="text-align: center; margin-bottom: 15px;">
+      निर्यात किए गए JSON फ़ाइल से प्रश्न आयात करें या वर्तमान डेटा निर्यात करें
+    </p>
     
     <div class="upload-btn-wrapper">
       <div class="upload-btn">
-        <i class="fas fa-camera"></i> छवि अपलोड करें (वैकल्पिक)
+        <span>📁 JSON फ़ाइल आयात करें</span>
       </div>
-      <input type="file" id="imageUpload" accept="image/*">
+      <input type="file" id="jsonImportFile" accept=".json">
     </div>
     
-    <div class="image-preview-container">
-      <img id="imagePreview" class="image-preview" alt="छवि पूर्वावलोकन" style="display:none;">
-      <button id="removeImageBtn" class="remove-image-btn" style="display:none;">
-        <i class="fas fa-trash"></i> छवि हटाएं
-      </button>
+    <div class="backup-actions">
+      <button class="btn" onclick="importJSONData()">⬆️ JSON आयात करें</button>
+      <button class="btn" onclick="exportJSONData()">⬇️ JSON निर्यात करें</button>
     </div>
     
-    <input id="optA" placeholder="विकल्प A">
-    <input id="optB" placeholder="विकल्प B">
-    <input id="optC" placeholder="विकल्प C">
-    <input id="optD" placeholder="विकल्प D">
-    <select id="correct">
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-    </select>
-    <textarea id="explanation" placeholder="व्याख्या लिखें (सामान्य टेक्स्ट)"></textarea>
-    <button class="btn" onclick="saveQuestion()">
-      <i class="fas fa-save"></i> सेव करें
-    </button>
-    <div id="questionCount" style="margin-top: 20px; font-size: 17px; text-align: center; font-weight: bold; color: #3949ab;"></div>
-    <div id="questionList" style="margin-top: 20px;"></div>
+    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+      <h4 style="margin-top: 0; color: #3949ab;">JSON फ़ाइल प्रारूप:</h4>
+      <pre style="overflow: auto; max-height: 150px; background: white; padding: 10px; border-radius: 4px;">
+{
+  "subject": "विषय का नाम",
+  "subtopic": "उपविषय का नाम",
+  "questions": [
+    {
+      "question": "प्रश्न टेक्स्ट",
+      "options": {
+        "A": "विकल्प A",
+        "B": "विकल्प B",
+        "C": "विकल्प C",
+        "D": "विकल्प D"
+      },
+      "correct": "A",
+      "explanation": "व्याख्या टेक्स्ट",
+      "image": "base64 छवि डेटा (वैकल्पिक)"
+    }
+  ]
+}</pre>
+    </div>
   </div>
 </div>
 
 <div id="practiceSection" class="section" style="display:none;">
-  <h3><i class="fas fa-brain"></i> अभ्यास शुरू करें</h3>
-  <div id="progress" style="font-size: 18px; font-weight: bold; text-align: center; color: #3949ab; margin: 15px 0;"></div>
-  <div id="gotoContainer" style="display: flex; gap: 10px; margin-top: 20px;">
-    <input id="gotoInput" type="number" placeholder="प्रश्न संख्या दर्ज करें" style="flex: 1; padding: 12px;">
-    <button id="gotoBtn" onclick="goToQuestion()" class="btn">
-      <i class="fas fa-arrow-right"></i> जाएं
-    </button>
+  <h3>🎯 अभ्यास शुरू करें</h3>
+  <div id="progress" style="font-weight:bold; font-size:18px; text-align:center; margin-bottom:15px;"></div>
+  <div id="gotoContainer" style="display:flex; gap:10px; margin-top:15px;">
+    <input id="gotoInput" type="number" placeholder="प्रश्न संख्या" style="flex:1; padding:12px;">
+    <button id="gotoBtn" onclick="goToQuestion()" class="btn">🔍 जाएं</button>
   </div>
-  <div id="quizQuestionContainer" style="margin-top: 25px;">
+  <div id="quizQuestionContainer" style="margin-top:20px;">
     <div id="quizQuestion" class="question-container"></div>
   </div>
   <div id="quizOptions"></div>
@@ -572,33 +410,38 @@ Phillips Curve का महत्व इस कारण है क्यों
 
 <div id="resultSection" class="section" style="display:none;">
   <div class="result-card">
-    <h3 style="text-align:center; color:#3949ab;">
-      <i class="fas fa-chart-line"></i> आपके परिणाम
-    </h3>
-    <div style="display:flex; flex-wrap:wrap; gap:25px; justify-content:center; align-items:center; margin-top: 30px;">
-      <div style="flex:1; min-width:250px;">
-        <div style="background:#f9f9f9; padding:20px; border-radius:12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05);">
-          <p style="font-size: 18px;"><strong><i class="fas fa-list"></i> कुल प्रश्न:</strong> <span id="totalQuestions">0</span></p>
-          <p style="font-size: 18px;"><strong><i class="fas fa-check-circle"></i> सही उत्तर:</strong> <span id="correctAnswers">0</span></p>
-          <p style="font-size: 18px;"><strong><i class="fas fa-times-circle"></i> गलत उत्तर:</strong> <span id="incorrectAnswers">0</span></p>
-          <p style="font-size: 18px;"><strong><i class="fas fa-percentage"></i> सटीकता:</strong> <span id="accuracyPercent" style="font-weight:bold; color:#3949ab;">0%</span></p>
+    <h3 style="text-align:center; color:#3949ab;">📊 आपके परिणाम</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:center;">
+      <div style="flex:1; min-width:200px;">
+        <div style="background:#f9f9f9; padding:15px; border-radius:8px;">
+          <p><strong>📝 कुल प्रश्न:</strong> <span id="totalQuestions">0</span></p>
+          <p><strong>✅ सही उत्तर:</strong> <span id="correctAnswers">0</span></p>
+          <p><strong>❌ गलत उत्तर:</strong> <span id="incorrectAnswers">0</span></p>
+          <p><strong>📊 सटीकता:</strong> <span id="accuracyPercent" style="font-weight:bold; color:#3949ab;">0%</span></p>
         </div>
-        <button class="btn" onclick="showWelcomeScreen()" style="margin-top:25px; width:100%;">
-          <i class="fas fa-home"></i> मुख्य मेनू पर वापस जाएं
-        </button>
       </div>
-      <div style="position:relative; width:280px; height:280px;">
+      <div style="position:relative; width:250px; height:250px;">
         <canvas id="resultChart"></canvas>
         <div class="accuracy-display">
           <span id="bigAccuracy">0%</span>
-          <div style="font-size:16px; color:#666; margin-top:5px;">सटीकता</div>
+          <div style="font-size:14px; color:#666;">सटीकता</div>
         </div>
       </div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn" onclick="resetQuiz()">🔄 नया टेस्ट शुरू करें</button>
+      <button class="btn" onclick="showInputSection()">📝 प्रश्न संपादित करें</button>
     </div>
   </div>
 </div>
 
 <script>
+// IndexedDB कॉन्फ़िगरेशन
+const DB_NAME = 'QuizAppDB';
+const DB_VERSION = 2;
+const STORE_NAME = 'quizzes';
+
+let db;
 let questions = [];
 let currentQuestion = 0;
 let correctCount = 0;
@@ -606,50 +449,98 @@ let incorrectCount = 0;
 let editIndex = -1;
 let currentImage = null;
 
-// स्टोरेज से डेटा लोड करने के लिए सुरक्षित फ़ंक्शन
-function safeGetStorage(key, defaultValue) {
-  try {
-    const value = localStorage.getItem(key);
-    return value !== null ? value : defaultValue;
-  } catch (e) {
-    console.error("localStorage से डेटा प्राप्त करने में त्रुटि:", e);
-    return defaultValue;
-  }
+// IndexedDB खोलें
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = (event) => {
+      console.error('डेटाबेस त्रुटि:', event.target.error);
+      document.getElementById('dbStatus').className = 'status-indicator status-disconnected';
+      reject(event.target.error);
+    };
+    
+    request.onsuccess = (event) => {
+      db = event.target.result;
+      console.log('डेटाबेस खोला गया');
+      document.getElementById('dbStatus').className = 'status-indicator status-connected';
+      updateStorageUsage();
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        console.log(`ऑब्जेक्ट स्टोर ${STORE_NAME} बनाया गया`);
+      }
+    };
+  });
 }
 
-// वेलकम स्क्रीन दिखाएं
-function showWelcomeScreen() {
-  document.getElementById("welcomeSection").style.display = "block";
-  document.getElementById("inputSection").style.display = "none";
-  document.getElementById("practiceSection").style.display = "none";
-  document.getElementById("resultSection").style.display = "none";
-}
-
-// क्विज़ शुरू करें
-function startQuiz(mode) {
-  document.getElementById("welcomeSection").style.display = "none";
+// डेटाबेस से क्विज लोड करें
+async function loadQuizFromDB(quizId) {
+  if (!db) await openDB();
   
-  try {
-    localStorage.setItem("quizMode", mode);
-    populateQuiz();
-  } catch (e) {
-    alert(`त्रुटि: ${e.message}`);
-    showWelcomeScreen();
-  }
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(quizId);
+    
+    request.onerror = (event) => {
+      console.error('डेटा लोड करने में त्रुटि:', event.target.error);
+      reject(event.target.error);
+    };
+    
+    request.onsuccess = (event) => {
+      const quizData = event.target.result;
+      resolve(quizData ? quizData.questions : []);
+    };
+  });
 }
 
-// टैब दिखाने का फंक्शन
-function showTab(tabId) {
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+// डेटाबेस में क्विज सहेजें
+async function saveQuizToDB(quizId, questions) {
+  if (!db) await openDB();
   
-  document.getElementById('pasteTab').style.display = 'none';
-  document.getElementById('addTab').style.display = 'none';
-  
-  document.getElementById(tabId).style.display = 'block';
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    
+    const quizData = {
+      id: quizId,
+      questions: questions,
+      lastUpdated: new Date()
+    };
+    
+    const request = store.put(quizData);
+    
+    request.onerror = (event) => {
+      console.error('डेटा सहेजने में त्रुटि:', event.target.error);
+      reject(event.target.error);
+    };
+    
+    request.onsuccess = (event) => {
+      console.log(`क्विज ${quizId} सहेजी गई`);
+      updateStorageUsage();
+      resolve();
+    };
+  });
 }
 
-// छवि अपलोड हेंडलर
+// स्टोरेज उपयोग अपडेट करें
+function updateStorageUsage() {
+  if (!navigator.storage || !navigator.storage.estimate) return;
+  
+  navigator.storage.estimate().then(estimate => {
+    const usedMB = (estimate.usage / (1024 * 1024)).toFixed(2);
+    const quotaMB = (estimate.quota / (1024 * 1024)).toFixed(2);
+    document.getElementById('storageInfo').textContent = 
+      `स्टोरेज उपयोग: ${usedMB} MB / ${quotaMB} MB`;
+  });
+}
+
+// इमेज अपलोड हैंडलर
 document.getElementById("imageUpload").addEventListener("change", function(event) {
   const file = event.target.files[0];
   if (file) {
@@ -664,7 +555,7 @@ document.getElementById("imageUpload").addEventListener("change", function(event
   }
 });
 
-// छवि हटाने का बटन
+// इमेज रिमूव हैंडलर
 document.getElementById("removeImageBtn").addEventListener("click", function() {
   currentImage = null;
   document.getElementById("imagePreview").src = "";
@@ -673,8 +564,27 @@ document.getElementById("removeImageBtn").addEventListener("click", function() {
   document.getElementById("imageUpload").value = "";
 });
 
-// प्रश्न सेव करना - सुधारित संस्करण
-function saveQuestion() {
+// फॉर्म साफ करें
+function clearForm() {
+  document.getElementById("question").value = '';
+  document.getElementById("optA").value = '';
+  document.getElementById("optB").value = '';
+  document.getElementById("optC").value = '';
+  document.getElementById("optD").value = '';
+  document.getElementById("explanation").value = '';
+  document.getElementById("correct").value = 'A';
+  
+  currentImage = null;
+  document.getElementById("imagePreview").src = "";
+  document.getElementById("imagePreview").style.display = "none";
+  document.getElementById("removeImageBtn").style.display = "none";
+  document.getElementById("imageUpload").value = "";
+  
+  editIndex = -1;
+}
+
+// प्रश्न सहेजें
+async function saveQuestion() {
   const q = document.getElementById("question").value.trim();
   const A = document.getElementById("optA").value.trim();
   const B = document.getElementById("optB").value.trim();
@@ -683,16 +593,8 @@ function saveQuestion() {
   const correct = document.getElementById("correct").value;
   const exp = document.getElementById("explanation").value.trim();
   
-  // विस्तृत त्रुटि संदेश
-  let errorMsg = "";
-  if (!q) errorMsg += "• प्रश्न\n";
-  if (!A) errorMsg += "• विकल्प A\n";
-  if (!B) errorMsg += "• विकल्प B\n";
-  if (!C) errorMsg += "• विकल्प C\n";
-  if (!D) errorMsg += "• विकल्प D\n";
-  
-  if (errorMsg) {
-    alert("❗ कृपया निम्नलिखित फ़ील्ड भरें:\n" + errorMsg);
+  if (!q || !A || !B || !C || !D || !correct) {
+    alert("❗ सभी फ़ील्ड भरें!");
     return;
   }
   
@@ -704,6 +606,8 @@ function saveQuestion() {
     image: currentImage
   };
   
+  const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
+  
   if (editIndex >= 0) {
     questions[editIndex] = newQ;
     editIndex = -1;
@@ -713,60 +617,13 @@ function saveQuestion() {
     alert("✅ नया प्रश्न जोड़ा गया!");
   }
   
-  const currentKey = `quiz_demo_demo`;
-  try {
-    localStorage.setItem(currentKey, JSON.stringify(questions));
-  } catch (e) {
-    console.error("localStorage में सेव करने में त्रुटि:", e);
-  }
-  
-  // फॉर्म रीसेट करें
-  document.getElementById("question").value = '';
-  document.getElementById("optA").value = '';
-  document.getElementById("optB").value = '';
-  document.getElementById("optC").value = '';
-  document.getElementById("optD").value = '';
-  document.getElementById("explanation").value = '';
-  document.getElementById("correct").value = 'A';
-  
-  // छवि फ़ील्ड रीसेट करें
-  currentImage = null;
-  document.getElementById("imagePreview").src = "";
-  document.getElementById("imagePreview").style.display = "none";
-  document.getElementById("removeImageBtn").style.display = "none";
-  document.getElementById("imageUpload").value = "";
-  
+  await saveQuizToDB(currentKey, questions);
+  clearForm();
   document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
   showAllQuestions();
 }
 
-// सभी प्रश्न दिखाना
-function showAllQuestions() {
-  const listDiv = document.getElementById("questionList");
-  listDiv.innerHTML = '';
-  
-  if (questions.length === 0) {
-    listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">कोई प्रश्न नहीं जोड़ा गया है</div>';
-    return;
-  }
-  
-  questions.forEach((q, index) => {
-    const div = document.createElement("div");
-    div.className = "question-item";
-    div.innerHTML = `
-      <div style="position:relative; padding-right: 40px;">
-        <button class="edit-btn" onclick="editQuestion(${index})">
-          <i class="fas fa-edit"></i> संपादित करें
-        </button>
-        <div class="question-text">Q${index + 1}: ${formatQuestionText(q.question)}</div>
-        ${q.image ? '<div style="font-size:14px; color:#666; margin-top:10px; background:#e3f2fd; padding:8px; border-radius:6px; display:inline-block;"><i class="fas fa-image"></i> छवि जुड़ी हुई है</div>' : ''}
-      </div>
-    `;
-    listDiv.appendChild(div);
-  });
-}
-
-// प्रश्न टेक्सट फॉर्मेट करना
+// प्रश्न फॉर्मेट करें
 function formatQuestionText(text) {
   const parts = text.split('\n');
   let result = `<strong>${parts[0]}</strong>`;
@@ -782,7 +639,32 @@ function formatQuestionText(text) {
   return result;
 }
 
-// प्रश्न संपादित करना
+// सभी प्रश्न दिखाएं
+function showAllQuestions() {
+  const listDiv = document.getElementById("questionList");
+  listDiv.innerHTML = '';
+  
+  if (questions.length === 0) {
+    listDiv.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">❌ कोई प्रश्न नहीं है, कृपया एक नया प्रश्न जोड़ें</div>';
+    return;
+  }
+  
+  questions.forEach((q, index) => {
+    const div = document.createElement("div");
+    div.className = "question-item";
+    div.innerHTML = `
+      <div style="position:relative;">
+        <button class="edit-btn" onclick="editQuestion(${index})">✏️</button>
+        <button class="edit-btn" onclick="deleteQuestion(${index})" style="right:25px; background:#f44336;">🗑️</button>
+        <div class="question-text">Q${index + 1}: ${formatQuestionText(q.question)}</div>
+        ${q.image ? '<div style="font-size:12px; color:#666; margin-top:5px;">📷 छवि जुड़ी हुई है</div>' : ''}
+      </div>
+    `;
+    listDiv.appendChild(div);
+  });
+}
+
+// प्रश्न संपादित करें
 function editQuestion(index) {
   const q = questions[index];
   document.getElementById("question").value = q.question;
@@ -805,24 +687,37 @@ function editQuestion(index) {
   }
   
   editIndex = index;
-  
   document.getElementById("inputSection").style.display = "block";
   document.getElementById("practiceSection").style.display = "none";
-  showTab('addTab');
+  document.getElementById("pageTitle").textContent = "✏️ प्रश्न संपादित करें";
+  
+  // स्क्रॉल शीर्ष पर ले जाएं
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// विशिष्ट प्रश्न पर जाना
+// प्रश्न हटाएं
+async function deleteQuestion(index) {
+  if (confirm(`क्या आप वाकई इस प्रश्न को हटाना चाहते हैं?`)) {
+    questions.splice(index, 1);
+    const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
+    await saveQuizToDB(currentKey, questions);
+    showAllQuestions();
+    document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
+  }
+}
+
+// विशिष्ट प्रश्न पर जाएं
 function goToQuestion() {
   const input = parseInt(document.getElementById("gotoInput").value);
   if (!input || input < 1 || input > questions.length) {
-    alert(`⚠️ कृपया मान्य प्रश्न संख्या दर्ज करें (1 से ${questions.length} के बीच)`);
+    alert(`⚠️ मान्य प्रश्न संख्या दर्ज करें (1 से ${questions.length} के बीच)`);
     return;
   }
   currentQuestion = input - 1;
   showQuestion();
 }
 
-// प्रश्न दिखाना
+// प्रश्न दिखाएं
 function showQuestion() {
   const q = questions[currentQuestion];
   
@@ -837,9 +732,6 @@ function showQuestion() {
   
   const quizQuestionHTML = `
     <div id="quizQuestion" class="question-container">
-      <button class="edit-btn" onclick="editCurrentQuestion()">
-        <i class="fas fa-edit"></i> संपादित करें
-      </button>
       <div class="question-text">📘 प्रश्न ${currentQuestion + 1}/${questions.length}: ${formatQuestionText(q.question)}</div>
       ${imageHTML}
     </div>
@@ -853,56 +745,25 @@ function showQuestion() {
   for (let key in q.options) {
     const btn = document.createElement("button");
     btn.className = "btn-option";
-    btn.innerHTML = `<strong>${key}:</strong> ${q.options[key]}`;
+    btn.textContent = `${key}: ${q.options[key]}`;
     btn.onclick = () => handleAnswer(key);
     optionsDiv.appendChild(btn);
   }
   
   const submitBtn = document.createElement("button");
-  submitBtn.innerHTML = "<i class='fas fa-check-circle'></i> क्विज़ सबमिट करें";
+  submitBtn.textContent = "✅ क्विज सबमिट करें";
   submitBtn.className = "btn submit-btn";
   submitBtn.onclick = () => {
-    if (confirm(`क्या आप वाकई क्विज़ सबमिट करना चाहते हैं?\nआपने ${correctCount + incorrectCount} प्रश्नों के उत्तर दिए हैं।`)) {
+    if (confirm(`क्या आप वाकई क्विज सबमिट करना चाहते हैं?\nआपने ${correctCount + incorrectCount} प्रश्नों के उत्तर दिए हैं।`)) {
       submitQuiz();
     }
   };
   optionsDiv.appendChild(submitBtn);
   
-  document.getElementById("progress").textContent = `📘 प्रश्न ${currentQuestion + 1} / ${questions.length}`;
-  document.getElementById("gotoInput").value = currentQuestion + 1;
+  document.getElementById("progress").innerHTML = `📘 प्रश्न ${currentQuestion + 1} / ${questions.length}`;
 }
 
-// वर्तमान प्रश्न संपादित करना
-function editCurrentQuestion() {
-  const q = questions[currentQuestion];
-  
-  document.getElementById("inputSection").style.display = "block";
-  document.getElementById("practiceSection").style.display = "none";
-  
-  document.getElementById("question").value = q.question;
-  document.getElementById("optA").value = q.options.A;
-  document.getElementById("optB").value = q.options.B;
-  document.getElementById("optC").value = q.options.C;
-  document.getElementById("optD").value = q.options.D;
-  document.getElementById("correct").value = q.correct;
-  document.getElementById("explanation").value = q.explanation;
-  
-  if (q.image) {
-    currentImage = q.image;
-    document.getElementById("imagePreview").src = q.image;
-    document.getElementById("imagePreview").style.display = "block";
-    document.getElementById("removeImageBtn").style.display = "block";
-  } else {
-    currentImage = null;
-    document.getElementById("imagePreview").style.display = "none";
-    document.getElementById("removeImageBtn").style.display = "none";
-  }
-  
-  editIndex = currentQuestion;
-  showTab('addTab');
-}
-
-// उत्तर संभालना
+// उत्तर संभालें
 function handleAnswer(selected) {
   const q = questions[currentQuestion];
   const optionsDiv = document.getElementById("quizOptions");
@@ -912,7 +773,7 @@ function handleAnswer(selected) {
   for (let btn of optionsDiv.children) {
     if (btn.className !== "btn-option") continue;
     
-    const key = btn.innerHTML.match(/<strong>([A-D])/)[1];
+    const key = btn.textContent[0];
     if (key === q.correct) {
       btn.style.backgroundColor = "#4CAF50";
       btn.style.color = "white";
@@ -924,7 +785,7 @@ function handleAnswer(selected) {
   
   const expl = document.createElement("div");
   expl.className = "explanation";
-  expl.innerHTML = `<strong><i class="fas fa-lightbulb"></i> व्याख्या:</strong><br>${(q.explanation || 'कोई व्याख्या नहीं दी गई है').replace(/\n/g, "<br>")}`;
+  expl.innerHTML = `<strong>📘 व्याख्या:</strong><br>${(q.explanation || 'कोई व्याख्या नहीं दी गई है').replace(/\n/g, "<br>")}`;
   optionsDiv.appendChild(expl);
   
   if (selected === q.correct) {
@@ -934,9 +795,7 @@ function handleAnswer(selected) {
   }
   
   const nextBtn = document.createElement("button");
-  nextBtn.innerHTML = currentQuestion < questions.length - 1 ? 
-    "<i class='fas fa-arrow-right'></i> अगला प्रश्न" : 
-    "<i class='fas fa-check-circle'></i> क्विज़ सबमिट करें";
+  nextBtn.textContent = currentQuestion < questions.length - 1 ? "➡️ अगला प्रश्न" : "✅ क्विज सबमिट करें";
   nextBtn.className = "btn";
   nextBtn.style.marginTop = "20px";
   nextBtn.onclick = () => {
@@ -947,7 +806,7 @@ function handleAnswer(selected) {
   optionsDiv.appendChild(nextBtn);
 }
 
-// क्विज़ सबमिट करना
+// क्विज सबमिट करें
 function submitQuiz() {
   const totalAnswered = correctCount + incorrectCount;
   const totalQuestions = questions.length;
@@ -974,12 +833,7 @@ function submitQuiz() {
       cutout: '65%',
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: {
-            font: {
-              size: 14
-            }
-          }
+          position: 'bottom'
         }
       }
     }
@@ -989,92 +843,34 @@ function submitQuiz() {
   document.getElementById("resultSection").style.display = "block";
 }
 
-// पेस्ट किए गए टेक्स्ट को पार्स करना - सुधारित संस्करण
-function parsePastedText() {
-  const pasteText = document.getElementById("pasteArea").value.trim();
-  if (!pasteText) {
-    alert("❗ कृपया पहले प्रश्न टेक्सट पेस्ट करें!");
-    return;
-  }
-
-  const lines = pasteText.split('\n').map(line => line.trim()).filter(line => line);
-  
-  // पहली लाइन प्रश्न है
-  const question = lines[0];
-  
-  // अगली 4 लाइनें विकल्प हैं
-  const options = {A: "विकल्प A", B: "विकल्प B", C: "विकल्प C", D: "विकल्प D"};
-  let optionIndex = 1;
-  
-  // विकल्पों को अधिक मजबूती से पार्स करना
-  for (let i = 1; i < lines.length && optionIndex <= 4; i++) {
-    const line = lines[i];
-    // यदि लाइन में (A), (B) आदि है तो उसे पार्स करें
-    if (line.match(/^\([A-D]\)/)) {
-      const key = line.charAt(1);
-      const value = line.substring(3).trim();
-      options[key] = value;
-      optionIndex++;
-    }
-    // यदि लाइन में केवल A., B. आदि है तो उसे पार्स करें
-    else if (line.match(/^[A-D]\./)) {
-      const key = line.charAt(0);
-      const value = line.substring(2).trim();
-      options[key] = value;
-      optionIndex++;
-    }
-  }
-  
-  // सही उत्तर और व्याख्या ढूंढना
-  let correct = "";
-  let explanation = "";
-  
-  for (let i = 1; i < lines.length; i++) {
-    if (lines[i].startsWith("✅ सही उत्तर:") || 
-        lines[i].startsWith("सही उत्तर:") || 
-        lines[i].startsWith("उत्तर:")) {
-      const match = lines[i].match(/[\( ]?([A-D])[\) ]?/);
-      if (match) correct = match[1];
-    } else if (lines[i].startsWith("📘 व्याख्या:") || 
-               lines[i].startsWith("व्याख्या:") || 
-               lines[i].startsWith("Explanation:")) {
-      explanation = lines[i].substring(lines[i].indexOf(':') + 1).trim();
-      // बाकी लाइन्स को जोड़ना
-      for (let j = i + 1; j < lines.length; j++) {
-        explanation += '\n' + lines[j];
-      }
-      break;
-    }
-  }
-  
-  // फॉर्म में भरना
-  document.getElementById("question").value = question;
-  document.getElementById("optA").value = options.A;
-  document.getElementById("optB").value = options.B;
-  document.getElementById("optC").value = options.C;
-  document.getElementById("optD").value = options.D;
-  document.getElementById("correct").value = correct || "A";
-  document.getElementById("explanation").value = explanation || "व्याख्या यहाँ लिखें";
-  
-  // पेस्ट टैब से जोड़ें टैब पर स्विच करें
-  showTab('addTab');
-  
-  alert("✅ प्रश्न फॉर्म में भर गया! अब 'सेव करें' बटन दबाएँ");
+// इनपुट सेक्शन दिखाएं
+function showInputSection() {
+  document.getElementById("resultSection").style.display = "none";
+  document.getElementById("inputSection").style.display = "block";
+  document.getElementById("pageTitle").textContent = "➕ प्रश्न जोड़ें";
 }
 
-// ऐप इनिशियलाइज़ करना
-function populateQuiz() {
+// क्विज रीसेट करें
+function resetQuiz() {
+  currentQuestion = 0;
+  correctCount = 0;
+  incorrectCount = 0;
+  
+  document.getElementById("resultSection").style.display = "none";
+  document.getElementById("practiceSection").style.display = "block";
+  showQuestion();
+}
+
+// क्विज लोड करें
+async function populateQuiz() {
+  const main = localStorage.getItem("selectedMain");
+  const sub = localStorage.getItem("selectedSub");
+  const mode = localStorage.getItem("quizMode") || "practice";
+  const currentKey = `quiz_${main}_${sub}`;
+  
   try {
-    const mode = localStorage.getItem("quizMode") || "input";
-    const currentKey = `quiz_demo_demo`;
-    
-    let storedQuestions = localStorage.getItem(currentKey);
-    try {
-      questions = storedQuestions ? JSON.parse(storedQuestions) : [];
-    } catch (e) {
-      questions = [];
-      console.error("प्रश्न पार्स करने में त्रुटि:", e);
-    }
+    await openDB();
+    questions = await loadQuizFromDB(currentKey);
     
     currentQuestion = 0;
     correctCount = 0;
@@ -1082,34 +878,122 @@ function populateQuiz() {
     editIndex = -1;
     currentImage = null;
     
+    document.getElementById("pageTitle").textContent = mode === "input" ? "➕ प्रश्न जोड़ें" : "🎯 अभ्यास";
+    
     if (mode === "input") {
       document.getElementById("inputSection").style.display = "block";
-      document.getElementById("practiceSection").style.display = "none";
-      document.getElementById("resultSection").style.display = "none";
       document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
       showAllQuestions();
     } else {
       if (questions.length === 0) {
-        alert("❗ कोई प्रश्न नहीं मिला! कृपया पहले कुछ प्रश्न जोड़ें।");
-        localStorage.setItem("quizMode", "input");
-        populateQuiz();
+        alert("❗ कोई प्रश्न नहीं मिला!");
+        showInputSection();
       } else {
-        document.getElementById("inputSection").style.display = "none";
         document.getElementById("practiceSection").style.display = "block";
-        document.getElementById("resultSection").style.display = "none";
         showQuestion();
       }
     }
   } catch (error) {
-    console.error(error);
-    alert("त्रुटि: " + error.message);
-    showWelcomeScreen();
+    console.error('क्विज लोड करने में त्रुटि:', error);
+    alert('क्विज लोड करने में त्रुटि। कृपया पेज रीलोड करें।');
   }
 }
 
-// पेज लोड होने पर ऐप शुरू करें
-window.onload = function() {
-  showWelcomeScreen();
+// JSON डेटा आयात करें
+async function importJSONData() {
+  const fileInput = document.getElementById('jsonImportFile');
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('कृपया एक JSON फ़ाइल चुनें');
+    return;
+  }
+  
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  
+  reader.onload = async function(e) {
+    try {
+      const jsonData = JSON.parse(e.target.result);
+      
+      // JSON डेटा सत्यापित करें
+      if (!jsonData.questions || !Array.isArray(jsonData.questions)) {
+        throw new Error('अमान्य JSON प्रारूप: प्रश्न सरणी गायब है');
+      }
+      
+      // आयात करने से पहले संदेश दिखाएं
+      if (!confirm(`क्या आप वाकई ${jsonData.questions.length} प्रश्न आयात करना चाहते हैं?\n\nविषय: ${jsonData.subject || 'निर्दिष्ट नहीं'}\nउपविषय: ${jsonData.subtopic || 'निर्दिष्ट नहीं'}`)) {
+        return;
+      }
+      
+      // वर्तमान प्रश्नों के साथ मर्ज करें
+      const currentKey = `quiz_${localStorage.getItem("selectedMain")}_${localStorage.getItem("selectedSub")}`;
+      const existingQuestions = await loadQuizFromDB(currentKey) || [];
+      const mergedQuestions = [...existingQuestions, ...jsonData.questions];
+      
+      // IndexedDB में सहेजें
+      await saveQuizToDB(currentKey, mergedQuestions);
+      
+      // UI अपडेट करें
+      questions = mergedQuestions;
+      document.getElementById("questionCount").textContent = `🔢 कुल प्रश्न: ${questions.length}`;
+      showAllQuestions();
+      
+      alert(`✅ ${jsonData.questions.length} प्रश्न सफलतापूर्वक आयात किए गए!`);
+      
+    } catch (error) {
+      console.error('JSON आयात त्रुटि:', error);
+      alert(`❗ JSON फ़ाइल आयात करने में त्रुटि: ${error.message}`);
+    }
+  };
+  
+  reader.readAsText(file);
+}
+
+// JSON डेटा निर्यात करें
+async function exportJSONData() {
+  const main = localStorage.getItem("selectedMain") || 'अज्ञात';
+  const sub = localStorage.getItem("selectedSub") || 'अज्ञात';
+  
+  const exportData = {
+    subject: main,
+    subtopic: sub,
+    questions: questions,
+    exportedAt: new Date().toISOString()
+  };
+  
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `प्रश्नोत्तरी_${main}_${sub}_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  alert(`📤 ${questions.length} प्रश्नों को JSON फ़ाइल के रूप में निर्यात किया गया!`);
+}
+
+// ऐप इनिशियलाइज़ करें
+window.onload = async function() {
+  // डेमो उद्देश्यों के लिए
+  if (!localStorage.getItem("selectedMain")) {
+    localStorage.setItem("selectedMain", "demo");
+    localStorage.setItem("selectedSub", "demo");
+    localStorage.setItem("quizMode", "input");
+  }
+  
+  await populateQuiz();
+  
+  // 5 सेकंड के बाद स्टोरेज उपयोग अपडेट करें
+  setTimeout(updateStorageUsage, 5000);
+  
+  // JSON आयात बटन के लिए इवेंट लिस्नर जोड़ें
+  document.getElementById('jsonImportFile').addEventListener('change', function() {
+    document.querySelector('.upload-btn span').textContent = 
+      `चयनित फ़ाइल: ${this.files[0].name}`;
+  });
 };
 </script>
 </body>
